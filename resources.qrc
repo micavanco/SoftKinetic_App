@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/Styles">
+        <file>stylesheet.css</file>
+        <file>images/arrowDownQSpinBox.png</file>
+        <file>images/arrowQComboBox.png</file>
+        <file>images/arrowUpQSpinBox.png</file>
+        <file>images/wood-wallpaper.jpg</file>
+    </qresource>
+</RCC>

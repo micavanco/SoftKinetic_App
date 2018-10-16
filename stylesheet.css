@@ -1,0 +1,269 @@
+QMainWindow#MovementAnalyzer
+{
+   background-image: url(:/Styles/images/wood-wallpaper.jpg);
+   background-position: center;
+}
+
+QLabel
+{
+    font-family: "Century Gothic";
+}
+
+QPushButton
+{
+    padding: 1px 13px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #804040;
+    font-family: "Century Gothic";
+    color:  white;
+    font-weight: bold, 600;
+    font-size: 14px;
+}
+
+
+QPushButton:hover
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #b26666;
+    border-width: 2px 2px 2px 2px;
+    border-radius: 2px;
+    border-color: black;
+    font-family: "Century Gothic";
+    color:  #f2f2f2;
+    font-weight: bold, 600;
+    font-size: 14px;
+}
+
+QPushButton:disabled
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #c5babf;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 2px;
+    border-color: grey;
+    font-family: "Century Gothic";
+    color:  white;
+    font-weight: bold, 600;
+    font-size: 14px;
+}
+
+QPushButton#cameraviewpushButton
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #6d645f;
+    border-width: 2px 2px 2px 2px;
+    border-radius: 3px;
+    border-color: black;
+    font-family: "Century Gothic";
+    color:  #f2f2f2;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+
+QPushButton#cameraviewpushButton:hover
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #b6afab;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 2px;
+    border-color: black;
+    font-family: "Century Gothic";
+    color:  #f2f2f2;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+QPushButton#cameraviewpushButton:disabled
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #c5babf;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 2px;
+    border-color: grey;
+    font-family: "Century Gothic";
+    color:  white;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+QPushButton#cameraviewpushButton_2
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #6d645f;
+    border-width: 2px 2px 2px 2px;
+    border-radius: 3px;
+    border-color: black;
+    font-family: "Century Gothic";
+    color:  #f2f2f2;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+
+QPushButton#cameraviewpushButton_2:hover
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #b6afab;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 2px;
+    border-color: black;
+    font-family: "Century Gothic";
+    color:  #f2f2f2;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+QPushButton#cameraviewpushButton_2:disabled
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #c5babf;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 2px;
+    border-color: grey;
+    font-family: "Century Gothic";
+    color:  white;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+QGroupBox#recordBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+border-radius: 12px;
+}
+
+QGroupBox#menuBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+border-radius: 12px;
+}
+
+QGroupBox#settingsBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+border-radius: 12px;
+}
+
+QGroupBox#cameraSettingsBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+border-radius: 12px;
+}
+
+QWidget#cameraView
+{
+    border-radius: 12px;
+}
+
+QGroupBox#cameramodeBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+    border-radius: 12px;
+}
+
+QRadioButton
+{
+    font-family: "Century Gothic";
+}
+
+/*
+
+QLabel#closeLabel
+{
+    font-family: "Segoe UI Black";
+}
+
+QLabel#camlabel
+{
+    font-family: "Segoe UI Black";
+}
+
+QLabel#camstatuslabel
+{
+    font-family: "Segoe UI Black";
+}
+
+
+QLabel#fpslabel
+{
+    font-family: "Segoe UI Black";
+}
+
+QLabel#colorlabel
+{
+    font-family: "Segoe UI Black";
+}
+
+QLabel#coordinatesLabel
+{
+    font-family: "Segoe UI Black";
+}
+
+QLabel#pointLabel
+{
+    font-family: "Segoe UI Black";
+}
+
+QLabel#label
+{
+    font-family: "Segoe UI Black";
+}*/
+
+/*
+QComboBox#frameFormatComboBox
+{
+    color: black;
+    background-color: white;
+    border-style: solid;
+    padding: 1px 0px 1px 20px;
+}
+
+QComboBox#colorComboBox
+{
+color: black;
+background-color: white;
+border-style: solid;
+padding: 1px 0px 1px 20px;
+}
+
+QSpinBox#fpsspinBox
+{
+color: black;
+background-color: white;
+border-style: solid;
+padding: 1px 0px 1px 20px;
+}
+
+QComboBox#cameraModComboBox
+{
+color: black;
+background-color: white;
+border-style: solid;
+padding: 1px 0px 1px 20px;
+}
+
+QComboBox::down-arrow {
+    image: url(:/Styles/images/arrowQComboBox.png);
+}
+
+QSpinBox::down-arrow {
+    image: url(:/Styles/images/arrowDownQSpinBox.png);
+}
+
+QSpinBox::up-arrow {
+    image: url(:/Styles/images/arrowUpQSpinBox.png);
+}*/
