@@ -411,8 +411,20 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="timeSpinBox">
+            <property name="prefix">
+             <string/>
+            </property>
+            <property name="suffix">
+             <string> s</string>
+            </property>
+            <property name="minimum">
+             <double>10.000000000000000</double>
+            </property>
             <property name="maximum">
-             <double>2.000000000000000</double>
+             <double>180.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>

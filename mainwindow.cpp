@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     ui->graphicsView->setScene(new QGraphicsScene(this));
-    ui->graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
+    //ui->graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
 
     connect(&projectionprocessor,
       SIGNAL(newFrame(QPixmap)),
