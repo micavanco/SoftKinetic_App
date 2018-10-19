@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     ui->graphicsView->setScene(new QGraphicsScene(this));
-    //ui->graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
+    ui->graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
 
     connect(&projectionprocessor,
       SIGNAL(newFrame(QPixmap)),
@@ -41,6 +41,11 @@ MainWindow::MainWindow(QWidget *parent) :
       ui->inVideo,
       SLOT(setPixmap(QPixmap)));
 
+    connect(&projectionprocessor, SIGNAL(CameraOn(QString)), ui->camstatuslabel_2, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(CameraOff(QString)), ui->camstatuslabel_2, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorValue(QString)), ui->coordinatesLabel_2, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorDepthValue(QString)), ui->milimeterValueLabel_2, SLOT(setText(QString)));
+
     connect(ui->graphicsView,
     SIGNAL(rubberBandChanged(QRect,QPointF,QPointF)),
     this,
@@ -48,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->graphicsView->fitInView(&pixmap,Qt::IgnoreAspectRatio);
     ui->graphicsView->scene()->addItem(&pixmap);
+
 
 }
 
@@ -317,7 +323,7 @@ void MainWindow::onRubberBandChanged(QRect rect,
 
 void MainWindow::onNewFrame(QPixmap newFrm)
 {
-    newFrm.scaled(400,400, Qt::IgnoreAspectRatio);
+    newFrm.scaled(640,480, Qt::IgnoreAspectRatio);
     pixmap.setPixmap(newFrm);
     ui->graphicsView->fitInView(&pixmap,Qt::IgnoreAspectRatio);
 }
