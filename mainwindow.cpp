@@ -274,6 +274,7 @@ void MainWindow::on_recordButton_pressed()
     ui->recordBox->setVisible(true);
     ui->line->setVisible(true);
     ui->graphicsView->setVisible(true);
+    ui->cameraSettingsBox->setVisible(false);
 }
 
 void MainWindow::on_openpushButton_2_pressed()
@@ -323,7 +324,7 @@ void MainWindow::onRubberBandChanged(QRect rect,
 
 void MainWindow::onNewFrame(QPixmap newFrm)
 {
-    newFrm.scaled(640,480, Qt::IgnoreAspectRatio);
+    newFrm.scaled(320,240, Qt::IgnoreAspectRatio);
     pixmap.setPixmap(newFrm);
     ui->graphicsView->fitInView(&pixmap,Qt::IgnoreAspectRatio);
 }

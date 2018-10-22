@@ -7,6 +7,7 @@
 #include "camerathread.h"
 #include <QMutexLocker>
 #include <DepthSense.hxx>
+#include "CompressiveTracker.h"
 
 class ProjectionProcessorThread : public QThread
 {
