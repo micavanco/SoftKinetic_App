@@ -8,11 +8,11 @@ VideoProcessorThread::VideoProcessorThread(QObject *parent) : QThread(parent)
 void VideoProcessorThread::run()
    {
      using namespace cv;
-     VideoCapture camera(0);
+     VideoCapture *camera = new VideoCapture(1);
      Mat inFrame;
-     while(camera.isOpened() && !isInterruptionRequested())
+     while(camera->isOpened() && !isInterruptionRequested())
      {
-       camera >> inFrame;
+       *camera >> inFrame;
        if(inFrame.empty())
        {
            emit CameraOff(QString("Wyłączona. \nSprawdź połączenie z komputerem\n i włącz ponownie."));
@@ -32,5 +32,7 @@ void VideoProcessorThread::run()
                      .rgbSwapped()));
 
      }
+     camera->release();
+     delete camera;
      emit CameraOff(QString("Wyłączona"));
    }

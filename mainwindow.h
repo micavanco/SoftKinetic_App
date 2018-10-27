@@ -62,6 +62,14 @@ private slots:
     void on_recordmoveButton_pressed();
     void onTimerTimeout();
 
+    void on_redSlider1_valueChanged(int value);
+    void on_redSlider2_valueChanged(int value);
+    void on_redSlider3_valueChanged(int value);
+
+    void on_blueSlider1_valueChanged(int value);
+    void on_blueSlider2_valueChanged(int value);
+    void on_blueSlider3_valueChanged(int value);
+
 signals:
     void mouseOnScreen();
     void mouseOffScreen();
@@ -80,6 +88,7 @@ private:
     double totalTime;
     QFile *file;
     QTextStream *streamOut;
+    QString fileTitle;
 };
 
 #endif // MAINWINDOW_H

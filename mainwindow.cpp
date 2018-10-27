@@ -294,6 +294,18 @@ void MainWindow::on_testButton_pressed()
     ui->cameraviewpushButton->setEnabled(false);
     ui->cameraviewpushButton_2->setEnabled(false);
     ui->inVideo->setVisible(true);
+    ui->redSlider1->setVisible(false);
+    ui->redColorLabel1->setVisible(false);
+    ui->redSlider2->setVisible(false);
+    ui->redColorLabel2->setVisible(false);
+    ui->redSlider3->setVisible(false);
+    ui->redColorLabel3->setVisible(false);
+    ui->blueSlider1->setVisible(false);
+    ui->blueColorLabel1->setVisible(false);
+    ui->blueSlider2->setVisible(false);
+    ui->blueColorLabel2->setVisible(false);
+    ui->blueSlider3->setVisible(false);
+    ui->blueColorLabel3->setVisible(false);
 }
 
 void MainWindow::on_recordButton_pressed()
@@ -309,6 +321,18 @@ void MainWindow::on_recordButton_pressed()
     ui->cameraviewpushButton->setEnabled(false);
     ui->cameraviewpushButton_2->setEnabled(false);
     ui->inVideo->setVisible(false);
+    ui->redSlider1->setVisible(true);
+    ui->redColorLabel1->setVisible(true);
+    ui->redSlider2->setVisible(true);
+    ui->redColorLabel2->setVisible(true);
+    ui->redSlider3->setVisible(true);
+    ui->redColorLabel3->setVisible(true);
+    ui->blueSlider1->setVisible(true);
+    ui->blueColorLabel1->setVisible(true);
+    ui->blueSlider2->setVisible(true);
+    ui->blueColorLabel2->setVisible(true);
+    ui->blueSlider3->setVisible(true);
+    ui->blueColorLabel3->setVisible(true);
 }
 
 void MainWindow::on_openpushButton_2_pressed()
@@ -384,11 +408,13 @@ void MainWindow::onNewTitle()
 
 void MainWindow::on_recordmoveButton_pressed()
 {
-    file = new QFile("../MovementAnalyzer/output/"+QTime::currentTime().toString("hh_mm_ss")+".txt");
+    fileTitle = QTime::currentTime().toString("hh_mm_ss");
+    file = new QFile("../MovementAnalyzer/output/"+fileTitle+".txt");
     file->open(QIODevice::ReadWrite | QIODevice::Text);
 
     streamOut = new QTextStream(file);
     *streamOut << QTime::currentTime().toString("hh:mm:ss")+"\n";
+    *streamOut << "Time [s]    Obiekt 1       Obiekt 2\n";
 
     timer = new QTimer(this);
     timer->setTimerType(Qt::PreciseTimer);
@@ -417,6 +443,42 @@ void MainWindow::onTimerTimeout()
         ui->timeSpinBox->setEnabled(true);
         ui->closepushButton_3->setEnabled(true);
         ui->recordmoveButton->setEnabled(true);
-        ui->timeLabel->setText(QString(""));
+        ui->timeLabel->setText("Zapisano do "+fileTitle+".txt");
     }
+}
+
+void MainWindow::on_redSlider1_valueChanged(int value)
+{
+    ui->redColorLabel1->setText(QString("%1").arg(value));
+    projectionprocessor.setHueRed(value);
+}
+
+void MainWindow::on_redSlider2_valueChanged(int value)
+{
+    ui->redColorLabel2->setText(QString("%1").arg(value));
+    projectionprocessor.setSaturationRed(value);
+}
+
+void MainWindow::on_redSlider3_valueChanged(int value)
+{
+    ui->redColorLabel3->setText(QString("%1").arg(value));
+    projectionprocessor.setValueRed(value);
+}
+
+void MainWindow::on_blueSlider1_valueChanged(int value)
+{
+    ui->blueColorLabel1->setText(QString("%1").arg(value));
+    projectionprocessor.setValueBlue(value);
+}
+
+void MainWindow::on_blueSlider2_valueChanged(int value)
+{
+    ui->blueColorLabel2->setText(QString("%1").arg(value));
+    projectionprocessor.setSaturationBlue(value);
+}
+
+void MainWindow::on_blueSlider3_valueChanged(int value)
+{
+    ui->blueColorLabel3->setText(QString("%1").arg(value));
+    projectionprocessor.setHueBlue(value);
 }

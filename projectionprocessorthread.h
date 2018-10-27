@@ -37,6 +37,12 @@ public slots:
 
     void setTrackRect(QRect rect);
     void setTrackRect2(QRect rect);
+    void setHueRed(int r){hueRed=r;}
+    void setSaturationRed(int r){saturationRed=r;}
+    void setValueRed(int r){valueRed=r;}
+    void setHueBlue(int b){hueBlue=b;}
+    void setSaturationBlue(int b){saturationBlue=b;}
+    void setValueBlue(int b){valueBlue=b;}
 private:
     DepthSense::Context    m_context;
     DepthSense::ColorNode  m_cnode;
@@ -46,6 +52,12 @@ private:
     float corY;
     float corX2;
     float corY2;
+    int hueRed;
+    int saturationRed;
+    int valueRed;
+    int hueBlue;
+    int saturationBlue;
+    int valueBlue;
     cv::Rect trackRect;
     cv::Rect trackRect2;
     QMutex rectMutex;

@@ -1,6 +1,7 @@
 #include "projectionprocessorthread.h"
 
-ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(parent)
+ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(parent), hueRed(149), saturationRed(126), valueRed(0),
+  hueBlue(46), saturationBlue(59), valueBlue(102)
 {
 
 }
@@ -92,7 +93,7 @@ void ProjectionProcessorThread::run()
        if(trackRect.size().area() > 0)
        {
            cvtColor(disp_mat, hsv, CV_BGR2HSV);
-           cv::inRange(hsv, cv::Scalar(160, 100, 100), cv::Scalar(179, 255, 255), backProj);
+           cv::inRange(hsv, cv::Scalar(hueRed, saturationRed, valueRed), cv::Scalar(hueRed+30, 255, 255), backProj);
 
 
          QMutexLocker locker(&rectMutex);
@@ -117,7 +118,7 @@ void ProjectionProcessorThread::run()
        if(trackRect2.size().area() > 0)
        {
          cvtColor(disp_mat2, hsv2, CV_BGR2HSV);
-         cv::inRange(hsv2, cv::Scalar(100, 150, 0), cv::Scalar(140, 255, 255), backProj2);
+         cv::inRange(hsv2, cv::Scalar(hueBlue, saturationBlue, valueBlue), cv::Scalar(hueBlue+30, 255, 255), backProj2);
 
          QMutexLocker locker(&rectMutex2);
          if(updateHistogram2)
