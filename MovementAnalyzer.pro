@@ -29,16 +29,14 @@ SOURCES += \
         videoprocessorthread.cpp \
     depthvideoprocessorthread.cpp \
     camerathread.cpp \
-    projectionprocessorthread.cpp \
-    compressivetracker.cpp
+    projectionprocessorthread.cpp
 
 HEADERS += \
         mainwindow.h \
         videoprocessorthread.h \
     depthvideoprocessorthread.h \
     camerathread.h \
-    projectionprocessorthread.h \
-    compressivetracker.h
+    projectionprocessorthread.h
 
 FORMS += \
         mainwindow.ui

@@ -1,6 +1,6 @@
 #include "projectionprocessorthread.h"
 
-ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(parent), color(0)
+ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(parent), treshold(25), treshold2(255)
 {
 
 }
@@ -35,19 +35,8 @@ void onNewDepthSample2(DepthSense::DepthNode node, DepthSense::DepthNode::NewSam
 void ProjectionProcessorThread::run()
    {
      using namespace cv;
-     float hrange[] = {0, 180};
-     const float* ranges[] = {hrange};
-     int bins = 24;
-     int channels[] = {0}; // the first and the only channel
-     int histSize[] = { bins }; // number of bins
-     int fromto[] = {0, 0};
-     Mat hsv, hue, histogram;
-     Mat backProj;
-     TermCriteria criteria;
-     criteria.maxCount = 5;
-     criteria.epsilon = 3;
-     criteria.type = TermCriteria::EPS;
      trackRect=cv::Rect();
+     trackRect2=cv::Rect();
 
      std::vector<DepthSense::Device> da; // wektor przechowujący obiekty będące reprezentacją pojedynczej podłączonej kamery, zawierające wszystkie niezbędne metody
 
@@ -81,103 +70,87 @@ void ProjectionProcessorThread::run()
 /*  -------------------- Główna pętla -------------------------------------------------    */
      //while(c_mat.empty())continue;   // wykonywanie pętli do momentu odebrania pierwszych danych ( jednej klatki z transmitowanego obrazu, w postaci macierzy )
      while(d_mat.empty())continue;   // wykonywanie pętli do momentu odebrania pierwszych danych ( jednej klatki z transmitowanego obrazu, w postaci macierzy )
-
-     CompressiveTracker ct;
      while(!isInterruptionRequested())
      {
         cv::Mat disp_mat = ModDepthForDisplay(d_mat);
+        cv::Mat disp_mat2=disp_mat.clone();
        if(d_mat.empty())
        {
-           m_cnode.unset();  // zakończ połączenie z kamerą i wyjdź z pętli
+           m_dnode.unset();  // zakończ połączenie z kamerą i wyjdź z pętli
            m_bDeviceFound = false;
            emit CameraOff(QString("Wyłączona. \nSprawdź połączenie z komputerem\n i włącz ponownie."));
            return;
        }
 
-       /*for(int i=0; i<histogram.rows; i++)
-           {
-           if(i==color || (i==color+1) || (i==color+2) || (i==color-1)) // filter
-                   histogram.at<float>(i,0) = 255;
-                 else
-                   histogram.at<float>(i,0) = 0;
-           }*/
-
-       /*for(int j=0;j<backProj.rows;j++)
-       {
-           for(int i=0;i<backProj.rows;i++)
-           {
-               if(backProj.at<float>(j,i)==255)
-               {
-               }
-           }
-       }*/
-
        if(trackRect.size().area() > 0)
        {
          QMutexLocker locker(&rectMutex);
 
-         //cvtColor(c_mat, hsv, CV_BGR2HSV);
-         //hue.create(hsv.size(), hsv.depth());
-         //mixChannels(&hsv, 1, &hue, 1, fromto, 1);
 
-         if(updateHistogram)
-         {
-           Mat last_gray;
-           Mat roi(disp_mat, trackRect);
-           backProj=roi;
-           cvtColor(disp_mat, last_gray, CV_RGB2GRAY);
-           rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
-           ct.init(last_gray, trackRect);
-
-           //calcHist(&roi, 1, channels, Mat(), histogram, 1, histSize, ranges);
-
-           /*normalize(histogram,
-               histogram,
-               0,
-               255,
-               NORM_MINMAX);*/
-
-
-
-
-
-           updateHistogram = false;
-         }
-
-        /* calcBackProject(&hue,
-           1,
-           0,
-           histogram,
-           backProj,
-           ranges);
-
-         TermCriteria criteria;
-         criteria.maxCount = 5;
-         criteria.epsilon = 3;
-         criteria.type = TermCriteria::EPS;
-         RotatedRect rotRec = CamShift(backProj, trackRect, criteria);
-         corX=rotRec.center.x;
-         corY=rotRec.center.y;
-         emit monitorValue(QString("x: %1, y: %2").arg(corX).arg(corY));
-         cvtColor(backProj, backProj, CV_GRAY2BGR);
-
-
-         //ellipse(backProj, rotRec, Scalar(0,255,0), 1);
-         rectangle(backProj, trackRect, Scalar(0,0,255), 1);*/
-
-
-         //ellipse(disp_mat, rotRec, Scalar(0,255,0), 1);
-        //rectangle(disp_mat, trackRect, Scalar(0,0,255), 1);
-
-         // get frame
         Mat current_gray;
-        cvtColor(disp_mat, current_gray, CV_RGB2GRAY);
-                 // Process Frame
-        ct.processFrame(current_gray, trackRect);
-        rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
+        cvtColor(disp_mat, current_gray, CV_BGR2GRAY);
+            blur( current_gray, current_gray, Size(3,3) );
+            Canny(current_gray, current_gray, 20, 75, 3);
+            //threshold(current_gray, current_gray,treshold, treshold*3,THRESH_BINARY_INV); //Threshold the gray
+            //cv::threshold(current_gray, current_gray, treshold, treshold2, cv::THRESH_BINARY);
+            /// Find contours
+            std::vector<std::vector<Point> > contours;
+            std::vector<Vec4i> hierarchy;
+            RNG rng(12345);
+            findContours( current_gray, contours, hierarchy,CV_RETR_CCOMP, CV_CHAIN_APPROX_TC89_L1 );
+            cvtColor(current_gray, disp_mat2, CV_GRAY2BGR);
+            /// Draw contours
+            Mat drawing = Mat::zeros( current_gray.size(), CV_8UC3 );
+            for( int i = 0; i< contours.size(); i++ )
+            {
+                //Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+                process_contour(drawing, contours[i]);
+                //if(qAbs(contourArea(contours[i]))<100)continue;
+                //drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
+            }
+            if(updateHistogram)
+            {
+              rectangle(drawing, trackRect, Scalar(0, 0, 255));
+              //ct.init(drawing, trackRect);
+
+              updateHistogram = false;
+            }
+        //ct.processFrame(drawing, trackRect);
+        TermCriteria criteria;
+        criteria.maxCount = 5;
+        criteria.epsilon = 3;
+        criteria.type = TermCriteria::EPS;
+        cvtColor(drawing, drawing, CV_BGR2GRAY);
+        CamShift(drawing, trackRect, criteria);
+        cvtColor(drawing, drawing, CV_GRAY2BGR);
+        rectangle(drawing, trackRect, Scalar(0, 0, 255));
         corX=trackRect.x+trackRect.width/2;
         corY=trackRect.y+trackRect.height/2;
         emit monitorValue(QString("x: %1, y: %2").arg(corX).arg(corY));
+        disp_mat=drawing;
+
+
+       }
+
+       if(trackRect2.size().area() > 0)
+       {
+         QMutexLocker locker(&rectMutex2);
+
+         if(updateHistogram2)
+         {
+           Mat last_gray;
+           cvtColor(disp_mat2, last_gray, CV_RGB2GRAY);
+           rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
+
+
+           updateHistogram2 = false;
+         }
+        Mat current_gray;
+        cvtColor(disp_mat2, current_gray, CV_RGB2GRAY);
+        rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
+        corX2=trackRect2.x+trackRect2.width/2;
+        corY2=trackRect2.y+trackRect2.height/2;
+        emit monitorValue2(QString("x: %1, y: %2").arg(corX2).arg(corY2));
        }
        emit CameraOn(QString("Włączona"));
 
@@ -194,10 +167,10 @@ void ProjectionProcessorThread::run()
        emit newFrame2(
             QPixmap::fromImage(
                QImage(
-                 backProj.data,
-                 backProj.cols,
-                 backProj.rows,
-                 backProj.step,
+                 disp_mat2.data,
+                 disp_mat2.cols,
+                 disp_mat2.rows,
+                 disp_mat2.step,
                  QImage::Format_RGB888)
                      .rgbSwapped()));
 
@@ -243,8 +216,11 @@ cv::Mat ProjectionProcessorThread::ModDepthForDisplay(const cv::Mat &mat)
         if(!fmat.empty())   // jeżeli kursor jest w obrębie obrazu (wartość getDepth) i macierz nie jest pusta to
         {
             float cameraDepth=(fmat.at<float>(corY, corX)-beta)/alpha; // przekonwertuj wartość na danej pozycji z powrotem do jednostki milimetra
+            float cameraDepth2=(fmat.at<float>(corY2, corX2)-beta)/alpha; // przekonwertuj wartość na danej pozycji z powrotem do jednostki milimetra
             if(cameraDepth==1000)emit monitorDepthValue(QString("Błąd odczytu"));    // jeżeli wartość wykracza poza zakres pracy kamery to wyslij informację o błędzie
             else emit monitorDepthValue(QString("%1 mm").arg(cameraDepth)); // emituj sygnał z wartością odległości obiektu od kamery
+            if(cameraDepth2==1000)emit monitorDepthValue2(QString("Błąd odczytu"));    // jeżeli wartość wykracza poza zakres pracy kamery to wyslij informację o błędzie
+            else emit monitorDepthValue2(QString("%1 mm").arg(cameraDepth2)); // emituj sygnał z wartością odległości obiektu od kamery
         }
 
         cv::Mat bmat;
@@ -255,6 +231,41 @@ cv::Mat ProjectionProcessorThread::ModDepthForDisplay(const cv::Mat &mat)
         cv::applyColorMap(cmat, cmat, 2); // zastosuj daną mapę kolorów
 
         return cmat;
+}
+
+void ProjectionProcessorThread::process_contour(cv::Mat& frame, contour_t const& contour)
+{
+    contour_t approx_contour2;
+    cv::approxPolyDP(contour, approx_contour2, cv::arcLength(contour, true) * 0.02, true);
+    cv::Scalar HEPTAGON_COLOR(0, 0, 255);
+
+    cv::Scalar colour = HEPTAGON_COLOR;
+    if(qAbs(contourArea(contour))<100 || !isContourConvex(approx_contour2))
+    {
+        if(approx_contour.size() == 4)
+        {
+                cv::Point const* points(&approx_contour[0]);
+                int n_points(static_cast<int>(approx_contour.size()));
+
+                polylines(frame, &points, &n_points, 1, true, colour, 4);
+        }
+        return;
+    }
+
+    if (approx_contour2.size() == 4) {
+        cv::Point const* points(&approx_contour2[0]);
+        int n_points(static_cast<int>(approx_contour2.size()));
+
+        polylines(frame, &points, &n_points, 1, true, colour, 4);
+        approx_contour=approx_contour2;
+
+    } else if(approx_contour.size() == 4){
+        cv::Point const* points(&approx_contour[0]);
+        int n_points(static_cast<int>(approx_contour.size()));
+
+        polylines(frame, &points, &n_points, 1, true, colour, 4);
+
+    }
 }
 
 void ProjectionProcessorThread::configureColorNode()
@@ -372,13 +383,16 @@ void ProjectionProcessorThread::configureNode(DepthSense::Node node)
 
 }
 
-
-
-
-void ProjectionProcessorThread::onNewColorValue(int c)
+void ProjectionProcessorThread::setTres(int i)
 {
-    color=c;
+    treshold=i;
 }
+
+void ProjectionProcessorThread::setTres2(int i)
+{
+    treshold2=i;
+}
+
 
 void ProjectionProcessorThread::setTrackRect(QRect rect)
 {
@@ -401,5 +415,29 @@ void ProjectionProcessorThread::setTrackRect(QRect rect)
      else trackRect.height = rect.height();
 
      updateHistogram = true;
+  }
+}
+
+void ProjectionProcessorThread::setTrackRect2(QRect rect)
+{
+  QMutexLocker locker(&rectMutex2);
+  if((rect.width()>2) && (rect.height()>2))
+  {
+     if(rect.left()<0)trackRect2.x=1;
+     else if(rect.left()>320)trackRect2.x=320;
+     else trackRect2.x = rect.left();
+
+     if(rect.top()<0)trackRect2.y=1;
+     else if(rect.top()>240)trackRect2.y=240;
+     else trackRect2.y = rect.top();
+
+
+     if(rect.left()+rect.width()>320)trackRect2.width=320-rect.left()-1;
+     else trackRect2.width = rect.width();
+
+     if(rect.height()+rect.top()>240)trackRect2.height=240-rect.top()-1;
+     else trackRect2.height = rect.height();
+
+     updateHistogram2 = true;
   }
 }

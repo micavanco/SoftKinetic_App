@@ -31,13 +31,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
+    ui->graphicsView_2->setScene(new QGraphicsScene(this));
+    ui->graphicsView_2->setDragMode(QGraphicsView::RubberBandDrag);
 
     connect(&projectionprocessor,
       SIGNAL(newFrame(QPixmap)),
       this,
       SLOT(onNewFrame(QPixmap)));
+
     connect(&projectionprocessor,
       SIGNAL(newFrame2(QPixmap)),
+      this,
+      SLOT(onNewFrame2(QPixmap)));
+
+    connect(&projectionprocessor,
+      SIGNAL(newFrame3(QPixmap)),
       ui->inVideo,
       SLOT(setPixmap(QPixmap)));
 
@@ -45,14 +53,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&projectionprocessor, SIGNAL(CameraOff(QString)), ui->camstatuslabel_2, SLOT(setText(QString)));
     connect(&projectionprocessor, SIGNAL(monitorValue(QString)), ui->coordinatesLabel_2, SLOT(setText(QString)));
     connect(&projectionprocessor, SIGNAL(monitorDepthValue(QString)), ui->milimeterValueLabel_2, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorValue2(QString)), ui->coordinatesLabel_3, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorDepthValue2(QString)), ui->milimeterValueLabel_3, SLOT(setText(QString)));
+
 
     connect(ui->graphicsView,
     SIGNAL(rubberBandChanged(QRect,QPointF,QPointF)),
     this,
     SLOT(onRubberBandChanged(QRect,QPointF,QPointF)));
 
+    connect(ui->graphicsView_2,
+    SIGNAL(rubberBandChanged(QRect,QPointF,QPointF)),
+    this,
+    SLOT(onRubberBandChanged2(QRect,QPointF,QPointF)));
+
     ui->graphicsView->fitInView(&pixmap,Qt::IgnoreAspectRatio);
     ui->graphicsView->scene()->addItem(&pixmap);
+
+    ui->graphicsView_2->fitInView(&pixmap2,Qt::IgnoreAspectRatio);
+    ui->graphicsView_2->scene()->addItem(&pixmap2);
 
 
 }
@@ -266,6 +285,12 @@ void MainWindow::on_testButton_pressed()
     ui->recordBox->setVisible(false);
     ui->line->setVisible(false);
     ui->graphicsView->setVisible(false);
+    ui->graphicsView_2->setVisible(false);
+    ui->objectLabel->setVisible(false);
+    ui->objectLabel2->setVisible(false);
+    ui->cameraviewpushButton->setEnabled(false);
+    ui->cameraviewpushButton_2->setEnabled(false);
+    ui->inVideo->setVisible(true);
 }
 
 void MainWindow::on_recordButton_pressed()
@@ -274,7 +299,13 @@ void MainWindow::on_recordButton_pressed()
     ui->recordBox->setVisible(true);
     ui->line->setVisible(true);
     ui->graphicsView->setVisible(true);
+    ui->graphicsView_2->setVisible(true);
+    ui->objectLabel->setVisible(true);
+    ui->objectLabel2->setVisible(true);
     ui->cameraSettingsBox->setVisible(false);
+    ui->cameraviewpushButton->setEnabled(false);
+    ui->cameraviewpushButton_2->setEnabled(false);
+    ui->inVideo->setVisible(false);
 }
 
 void MainWindow::on_openpushButton_2_pressed()
@@ -306,20 +337,22 @@ void MainWindow::on_cameraviewpushButton_2_pressed()
     if(ui->cameraviewDock->isHidden())
         ui->cameraviewDock->show();
     ui->cameraviewDock->setFloating(false);
-    ui->cameraviewpushButton->setEnabled(false);
+    ui->cameraviewpushButton_2->setEnabled(false);
 }
 
-void MainWindow::on_colorSlider_sliderMoved(int position)
-{
-    ui->colorLabel->setText(QString("%1").arg(position));
-    projectionprocessor.onNewColorValue(position);
-}
 
 void MainWindow::onRubberBandChanged(QRect rect,
   QPointF frScn,
   QPointF toScn)
   {
     projectionprocessor.setTrackRect(rect);
+  }
+
+void MainWindow::onRubberBandChanged2(QRect rect,
+  QPointF frScn,
+  QPointF toScn)
+  {
+    projectionprocessor.setTrackRect2(rect);
   }
 
 void MainWindow::onNewFrame(QPixmap newFrm)
@@ -329,3 +362,22 @@ void MainWindow::onNewFrame(QPixmap newFrm)
     ui->graphicsView->fitInView(&pixmap,Qt::IgnoreAspectRatio);
 }
 
+void MainWindow::onNewFrame2(QPixmap newFrm)
+{
+    newFrm.scaled(320,240, Qt::IgnoreAspectRatio);
+    pixmap2.setPixmap(newFrm);
+    ui->graphicsView_2->fitInView(&pixmap2,Qt::IgnoreAspectRatio);
+}
+
+
+void MainWindow::on_horizontalSlider_valueChanged(int value)
+{
+    ui->colorLabel->setText(QString("%1").arg(value));
+    projectionprocessor.setTres(value);
+}
+
+void MainWindow::on_horizontalSlider_2_valueChanged(int value)
+{
+    ui->colorLabel_2->setText(QString("%1").arg(value));
+    projectionprocessor.setTres2(value);
+}
