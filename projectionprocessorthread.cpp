@@ -1,6 +1,6 @@
 #include "projectionprocessorthread.h"
 
-ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(parent), color(0)
+ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(parent)
 {
 
 }
@@ -35,19 +35,14 @@ void onNewDepthSample2(DepthSense::DepthNode node, DepthSense::DepthNode::NewSam
 void ProjectionProcessorThread::run()
    {
      using namespace cv;
-     float hrange[] = {0, 180};
-     const float* ranges[] = {hrange};
-     int bins = 24;
-     int channels[] = {0}; // the first and the only channel
-     int histSize[] = { bins }; // number of bins
-     int fromto[] = {0, 0};
-     Mat hsv, hue, histogram;
-     Mat backProj;
+     trackRect=cv::Rect();
+     trackRect2=cv::Rect();
+     Mat hsv, hsv2;
+     Mat backProj, backProj2;
      TermCriteria criteria;
      criteria.maxCount = 5;
      criteria.epsilon = 3;
      criteria.type = TermCriteria::EPS;
-     trackRect=cv::Rect();
 
      std::vector<DepthSense::Device> da; // wektor przechowujący obiekty będące reprezentacją pojedynczej podłączonej kamery, zawierające wszystkie niezbędne metody
 
@@ -68,8 +63,8 @@ void ProjectionProcessorThread::run()
          return;
      }
      emit CameraOn(QString::fromStdString(da[0].getSerialNumber()));
-     //m_cnode.newSampleReceivedEvent().connect(&onNewColorSample);    // przekazanie referencji do metody onNewColorSample do metody connect w celu powiązania funkcji
-     m_dnode.newSampleReceivedEvent().connect(&onNewDepthSample2);    // przekazanie referencji do metody onNewColorSample do metody connect w celu powiązania funkcji
+     m_cnode.newSampleReceivedEvent().connect(&onNewColorSample);    // przekazanie referencji do metody onNewColorSample do metody connect w celu powiązania funkcji
+     //m_dnode.newSampleReceivedEvent().connect(&onNewDepthSample2);    // przekazanie referencji do metody onNewColorSample do metody connect w celu powiązania funkcji
 
      CameraThread camThread;    /*utworzenie nowego wątku*/          // przyjmującej odebrane dane z transmisji kamery, przekazywane jako parametry funkcji
      camThread.set(m_context);   // przekazanie do metody wątku ustawiającego kontekst, czyli klasę reprezentującą sesję aplikacji (połączenie klienta przez TCP/IP)
@@ -79,14 +74,11 @@ void ProjectionProcessorThread::run()
          camThread.start();      // rozpocznij nowy wątek transmisji danych z kamery
      }
 /*  -------------------- Główna pętla -------------------------------------------------    */
-     //while(c_mat.empty())continue;   // wykonywanie pętli do momentu odebrania pierwszych danych ( jednej klatki z transmitowanego obrazu, w postaci macierzy )
-     while(d_mat.empty())continue;   // wykonywanie pętli do momentu odebrania pierwszych danych ( jednej klatki z transmitowanego obrazu, w postaci macierzy )
-
-     CompressiveTracker ct;
+     while(c_mat.empty())continue;   // wykonywanie pętli do momentu odebrania pierwszych danych ( jednej klatki z transmitowanego obrazu, w postaci macierzy )
+     //while(d_mat.empty())continue;   // wykonywanie pętli do momentu odebrania pierwszych danych ( jednej klatki z transmitowanego obrazu, w postaci macierzy )
      while(!isInterruptionRequested())
      {
-        cv::Mat disp_mat = ModDepthForDisplay(d_mat);
-       if(d_mat.empty())
+       if(c_mat.empty())
        {
            m_cnode.unset();  // zakończ połączenie z kamerą i wyjdź z pętli
            m_bDeviceFound = false;
@@ -94,90 +86,54 @@ void ProjectionProcessorThread::run()
            return;
        }
 
-       /*for(int i=0; i<histogram.rows; i++)
-           {
-           if(i==color || (i==color+1) || (i==color+2) || (i==color-1)) // filter
-                   histogram.at<float>(i,0) = 255;
-                 else
-                   histogram.at<float>(i,0) = 0;
-           }*/
-
-       /*for(int j=0;j<backProj.rows;j++)
-       {
-           for(int i=0;i<backProj.rows;i++)
-           {
-               if(backProj.at<float>(j,i)==255)
-               {
-               }
-           }
-       }*/
+       cv::Mat disp_mat = c_mat.clone();
+       cv::Mat disp_mat2=disp_mat.clone();
 
        if(trackRect.size().area() > 0)
        {
+           cvtColor(disp_mat, hsv, CV_BGR2HSV);
+           cv::inRange(hsv, cv::Scalar(160, 100, 100), cv::Scalar(179, 255, 255), backProj);
+
+
          QMutexLocker locker(&rectMutex);
 
-         //cvtColor(c_mat, hsv, CV_BGR2HSV);
-         //hue.create(hsv.size(), hsv.depth());
-         //mixChannels(&hsv, 1, &hue, 1, fromto, 1);
+            if(updateHistogram)
+            {
+              rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
+              emit newTitle(QString("Obiekt 1"));
+              emit checkIfRecord();
 
-         if(updateHistogram)
-         {
-           Mat last_gray;
-           Mat roi(disp_mat, trackRect);
-           backProj=roi;
-           cvtColor(disp_mat, last_gray, CV_RGB2GRAY);
-           rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
-           ct.init(last_gray, trackRect);
-
-           //calcHist(&roi, 1, channels, Mat(), histogram, 1, histSize, ranges);
-
-           /*normalize(histogram,
-               histogram,
-               0,
-               255,
-               NORM_MINMAX);*/
-
-
-
-
-
-           updateHistogram = false;
-         }
-
-        /* calcBackProject(&hue,
-           1,
-           0,
-           histogram,
-           backProj,
-           ranges);
-
-         TermCriteria criteria;
-         criteria.maxCount = 5;
-         criteria.epsilon = 3;
-         criteria.type = TermCriteria::EPS;
-         RotatedRect rotRec = CamShift(backProj, trackRect, criteria);
-         corX=rotRec.center.x;
-         corY=rotRec.center.y;
-         emit monitorValue(QString("x: %1, y: %2").arg(corX).arg(corY));
-         cvtColor(backProj, backProj, CV_GRAY2BGR);
-
-
-         //ellipse(backProj, rotRec, Scalar(0,255,0), 1);
-         rectangle(backProj, trackRect, Scalar(0,0,255), 1);*/
-
-
-         //ellipse(disp_mat, rotRec, Scalar(0,255,0), 1);
-        //rectangle(disp_mat, trackRect, Scalar(0,0,255), 1);
-
-         // get frame
-        Mat current_gray;
-        cvtColor(disp_mat, current_gray, CV_RGB2GRAY);
-                 // Process Frame
-        ct.processFrame(current_gray, trackRect);
+              updateHistogram = false;
+            }
+        CamShift(backProj, trackRect, criteria);
+        cvtColor(backProj, disp_mat, CV_GRAY2BGR);
         rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
         corX=trackRect.x+trackRect.width/2;
         corY=trackRect.y+trackRect.height/2;
         emit monitorValue(QString("x: %1, y: %2").arg(corX).arg(corY));
+
+       }
+
+       if(trackRect2.size().area() > 0)
+       {
+         cvtColor(disp_mat2, hsv2, CV_BGR2HSV);
+         cv::inRange(hsv2, cv::Scalar(100, 150, 0), cv::Scalar(140, 255, 255), backProj2);
+
+         QMutexLocker locker(&rectMutex2);
+         if(updateHistogram2)
+         {
+           rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
+           emit newTitle2(QString("Obiekt 2"));
+           emit checkIfRecord();
+
+           updateHistogram2 = false;
+         }
+         CamShift(backProj2, trackRect2, criteria);
+         cvtColor(backProj2, disp_mat2, CV_GRAY2BGR);
+         rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
+        corX2=trackRect2.x+trackRect2.width/2;
+        corY2=trackRect2.y+trackRect2.height/2;
+        emit monitorValue2(QString("x: %1, y: %2").arg(corX2).arg(corY2));
        }
        emit CameraOn(QString("Włączona"));
 
@@ -194,10 +150,10 @@ void ProjectionProcessorThread::run()
        emit newFrame2(
             QPixmap::fromImage(
                QImage(
-                 backProj.data,
-                 backProj.cols,
-                 backProj.rows,
-                 backProj.step,
+                 disp_mat2.data,
+                 disp_mat2.cols,
+                 disp_mat2.rows,
+                 disp_mat2.step,
                  QImage::Format_RGB888)
                      .rgbSwapped()));
 
@@ -243,8 +199,11 @@ cv::Mat ProjectionProcessorThread::ModDepthForDisplay(const cv::Mat &mat)
         if(!fmat.empty())   // jeżeli kursor jest w obrębie obrazu (wartość getDepth) i macierz nie jest pusta to
         {
             float cameraDepth=(fmat.at<float>(corY, corX)-beta)/alpha; // przekonwertuj wartość na danej pozycji z powrotem do jednostki milimetra
+            float cameraDepth2=(fmat.at<float>(corY2, corX2)-beta)/alpha; // przekonwertuj wartość na danej pozycji z powrotem do jednostki milimetra
             if(cameraDepth==1000)emit monitorDepthValue(QString("Błąd odczytu"));    // jeżeli wartość wykracza poza zakres pracy kamery to wyslij informację o błędzie
             else emit monitorDepthValue(QString("%1 mm").arg(cameraDepth)); // emituj sygnał z wartością odległości obiektu od kamery
+            if(cameraDepth2==1000)emit monitorDepthValue2(QString("Błąd odczytu"));    // jeżeli wartość wykracza poza zakres pracy kamery to wyslij informację o błędzie
+            else emit monitorDepthValue2(QString("%1 mm").arg(cameraDepth2)); // emituj sygnał z wartością odległości obiektu od kamery
         }
 
         cv::Mat bmat;
@@ -372,34 +331,50 @@ void ProjectionProcessorThread::configureNode(DepthSense::Node node)
 
 }
 
-
-
-
-void ProjectionProcessorThread::onNewColorValue(int c)
-{
-    color=c;
-}
-
 void ProjectionProcessorThread::setTrackRect(QRect rect)
 {
   QMutexLocker locker(&rectMutex);
   if((rect.width()>2) && (rect.height()>2))
   {
      if(rect.left()<0)trackRect.x=1;
-     else if(rect.left()>320)trackRect.x=320;
+     else if(rect.left()>640)trackRect.x=640;
      else trackRect.x = rect.left();
 
      if(rect.top()<0)trackRect.y=1;
-     else if(rect.top()>240)trackRect.y=240;
+     else if(rect.top()>480)trackRect.y=480;
      else trackRect.y = rect.top();
 
 
-     if(rect.left()+rect.width()>320)trackRect.width=320-rect.left()-1;
+     if(rect.left()+rect.width()>640)trackRect.width=640-rect.left()-1;
      else trackRect.width = rect.width();
 
-     if(rect.height()+rect.top()>240)trackRect.height=240-rect.top()-1;
+     if(rect.height()+rect.top()>480)trackRect.height=480-rect.top()-1;
      else trackRect.height = rect.height();
 
      updateHistogram = true;
+  }
+}
+
+void ProjectionProcessorThread::setTrackRect2(QRect rect)
+{
+  QMutexLocker locker(&rectMutex2);
+  if((rect.width()>2) && (rect.height()>2))
+  {
+     if(rect.left()<0)trackRect2.x=1;
+     else if(rect.left()>640)trackRect2.x=640;
+     else trackRect2.x = rect.left();
+
+     if(rect.top()<0)trackRect2.y=1;
+     else if(rect.top()>480)trackRect2.y=480;
+     else trackRect2.y = rect.top();
+
+
+     if(rect.left()+rect.width()>640)trackRect2.width=640-rect.left()-1;
+     else trackRect2.width = rect.width();
+
+     if(rect.height()+rect.top()>480)trackRect2.height=480-rect.top()-1;
+     else trackRect2.height = rect.height();
+
+     updateHistogram2 = true;
   }
 }

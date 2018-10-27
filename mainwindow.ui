@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1483</width>
+    <width>1493</width>
     <height>588</height>
    </rect>
   </property>
@@ -15,6 +15,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1493</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="mouseTracking">
    <bool>false</bool>
@@ -439,7 +445,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Filtr projekcji wstecznej:</string>
+             <string>Czas do końca nagrywania:</string>
             </property>
            </widget>
           </item>
@@ -455,31 +461,6 @@
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QSlider" name="colorSlider">
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>180</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="horizontalLayoutWidget_2">
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>140</y>
-           <width>151</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
            <widget class="QLabel" name="colorLabel">
             <property name="font">
@@ -504,7 +485,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>160</y>
+           <y>140</y>
            <width>151</width>
            <height>151</height>
           </rect>
@@ -619,7 +600,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>310</y>
+           <y>290</y>
            <width>151</width>
            <height>41</height>
           </rect>
@@ -639,30 +620,47 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>350</y>
+           <y>330</y>
            <width>151</width>
-           <height>76</height>
+           <height>100</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <item>
-             <widget class="QLabel" name="pointLabel_2">
-              <property name="font">
-               <font>
-                <family>Segoe UI Black</family>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Współrzędne punktu:</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QLabel" name="label_4">
+            <property name="font">
+             <font>
+              <family>Century Gothic</family>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid grey;</string>
+            </property>
+            <property name="text">
+             <string>Obiekt 1</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="pointLabel_2">
+            <property name="font">
+             <font>
+              <family>Segoe UI Black</family>
+              <pointsize>8</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Współrzędne punktu:</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="coordinatesLabel_2">
@@ -670,6 +668,9 @@
              <font>
               <underline>false</underline>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -690,6 +691,9 @@
                 <bold>true</bold>
                </font>
               </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string>Odległość:</string>
               </property>
@@ -705,6 +709,9 @@
               <weight>75</weight>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -723,7 +730,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>450</y>
+           <y>540</y>
            <width>149</width>
            <height>21</height>
           </rect>
@@ -734,6 +741,117 @@
          <property name="text">
           <string>NAGRYWAJ</string>
          </property>
+        </widget>
+        <widget class="QWidget" name="verticalLayoutWidget_10">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>430</y>
+           <width>151</width>
+           <height>101</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="font">
+             <font>
+              <family>Century Gothic</family>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid grey;</string>
+            </property>
+            <property name="text">
+             <string>Obiekt 2</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QLabel" name="pointLabel_3">
+              <property name="font">
+               <font>
+                <family>Segoe UI Black</family>
+                <pointsize>8</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string>Współrzędne punktu:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="coordinatesLabel_3">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="font">
+               <font>
+                <family>Segoe UI Black</family>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string>Odległość:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="milimeterValueLabel_3">
+            <property name="font">
+             <font>
+              <family>Segoe UI Black</family>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>
@@ -1045,26 +1163,106 @@
    <widget class="QWidget" name="cameraView">
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
-      <widget class="QGraphicsView" name="graphicsView">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>320</width>
-         <height>240</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>320</width>
-         <height>240</height>
-        </size>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QLabel" name="objectLabel">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Century Gothic</family>
+           <pointsize>20</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:red;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGraphicsView" name="graphicsView">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>640</width>
+           <height>480</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>640</width>
+           <height>480</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QLabel" name="objectLabel2">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Century Gothic</family>
+           <pointsize>20</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:blue;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGraphicsView" name="graphicsView_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>640</width>
+           <height>480</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>640</width>
+           <height>480</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="Line" name="line">

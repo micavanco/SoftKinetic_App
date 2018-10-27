@@ -7,7 +7,6 @@
 #include "camerathread.h"
 #include <QMutexLocker>
 #include <DepthSense.hxx>
-#include "CompressiveTracker.h"
 
 class ProjectionProcessorThread : public QThread
 {
@@ -26,23 +25,33 @@ signals:
     void CameraOff(QString) const ;
     void newFrame(QPixmap pix);
     void newFrame2(QPixmap pix);
+    void newFrame3(QPixmap pix);
     void monitorValue(QString) const;
     void monitorDepthValue(QString) const;
+    void monitorValue2(QString) const;
+    void monitorDepthValue2(QString) const;
+    void newTitle(QString) const;
+    void newTitle2(QString) const;
+    void checkIfRecord();
 public slots:
-    void onNewColorValue(int c);
 
     void setTrackRect(QRect rect);
+    void setTrackRect2(QRect rect);
 private:
     DepthSense::Context    m_context;
     DepthSense::ColorNode  m_cnode;
     DepthSense::DepthNode  m_dnode;
     bool m_bDeviceFound;
-    int color;
     float corX;
     float corY;
+    float corX2;
+    float corY2;
     cv::Rect trackRect;
+    cv::Rect trackRect2;
     QMutex rectMutex;
+    QMutex rectMutex2;
     bool updateHistogram;
+    bool updateHistogram2;
 
     void run() override;
     friend void onNewColorSample(DepthSense::DepthNode node, DepthSense::DepthNode::NewSampleReceivedData data);

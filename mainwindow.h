@@ -47,10 +47,13 @@ private slots:
 
     void on_cameraviewpushButton_2_pressed();
 
-    void on_colorSlider_sliderMoved(int position);
     void onRubberBandChanged(QRect rect,
     QPointF frScn, QPointF toScn);
+    void onRubberBandChanged2(QRect rect,
+    QPointF frScn, QPointF toScn);
     void onNewFrame(QPixmap newFrm);
+    void onNewFrame2(QPixmap newFrm);
+    void onNewTitle();
 
 signals:
     void mouseOnScreen();
@@ -64,6 +67,7 @@ private:
     QPoint startPoint;
     bool wasAdd;
     QGraphicsPixmapItem pixmap;
+    QGraphicsPixmapItem pixmap2;
 };
 
 #endif // MAINWINDOW_H
