@@ -462,7 +462,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLabel" name="colorLabel">
+           <widget class="QLabel" name="timeLabel">
             <property name="font">
              <font>
               <family>Segoe UI Black</family>
@@ -471,8 +471,11 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="styleSheet">
+             <string notr="true">color:red;</string>
+            </property>
             <property name="text">
-             <string>0</string>
+             <string/>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

@@ -13,6 +13,10 @@
 #include <QGraphicsScene>
 #include <QLabel>
 #include <QGraphicsPixmapItem>
+#include <QTimer>
+#include <QFile>
+#include <QTime>
+#include <QTextStream>
 
 
 namespace Ui {
@@ -55,6 +59,9 @@ private slots:
     void onNewFrame2(QPixmap newFrm);
     void onNewTitle();
 
+    void on_recordmoveButton_pressed();
+    void onTimerTimeout();
+
 signals:
     void mouseOnScreen();
     void mouseOffScreen();
@@ -68,6 +75,11 @@ private:
     bool wasAdd;
     QGraphicsPixmapItem pixmap;
     QGraphicsPixmapItem pixmap2;
+    QTimer *timer;
+    double time;
+    double totalTime;
+    QFile *file;
+    QTextStream *streamOut;
 };
 
 #endif // MAINWINDOW_H

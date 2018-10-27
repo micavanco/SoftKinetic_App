@@ -381,3 +381,42 @@ void MainWindow::onNewTitle()
         ui->recordmoveButton->setEnabled(true);
 }
 
+
+void MainWindow::on_recordmoveButton_pressed()
+{
+    file = new QFile("../MovementAnalyzer/output/"+QTime::currentTime().toString("hh_mm_ss")+".txt");
+    file->open(QIODevice::ReadWrite | QIODevice::Text);
+
+    streamOut = new QTextStream(file);
+    *streamOut << QTime::currentTime().toString("hh:mm:ss")+"\n";
+
+    timer = new QTimer(this);
+    timer->setTimerType(Qt::PreciseTimer);
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimerTimeout()));
+    time = ui->timeSpinBox->value();
+    totalTime = time;
+    ui->timeLabel->setText(QString("%1").arg(time));
+    timer->start(10);
+    ui->timeSpinBox->setEnabled(false);
+    ui->closepushButton_3->setEnabled(false);
+    ui->recordmoveButton->setEnabled(false);
+}
+
+void MainWindow::onTimerTimeout()
+{
+    *streamOut << QString("%1").arg(totalTime-time)+"  -  "+ui->coordinatesLabel_2->text()+"  |  "+ui->coordinatesLabel_2->text()+"\n";
+    time -= 0.01;
+    ui->timeLabel->setText(QString("%1").arg(time));
+    if(time <= 0.0)
+    {
+        timer->stop();
+        file->flush();
+        file->close();
+        delete file;
+        delete streamOut;
+        ui->timeSpinBox->setEnabled(true);
+        ui->closepushButton_3->setEnabled(true);
+        ui->recordmoveButton->setEnabled(true);
+        ui->timeLabel->setText(QString(""));
+    }
+}
