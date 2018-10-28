@@ -111,8 +111,8 @@ void ProjectionProcessorThread::run()
         rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
         corX=trackRect.x+trackRect.width/2;
         corY=trackRect.y+trackRect.height/2;
-        emit monitorValue(QString("x: %1, y: %2").arg(corX).arg(corY));
-
+        emit monitorValuex(QString("%1").arg(corX));
+        emit monitorValuey(QString("%1").arg(corY));
        }
 
        if(trackRect2.size().area() > 0)
@@ -134,7 +134,8 @@ void ProjectionProcessorThread::run()
          rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
         corX2=trackRect2.x+trackRect2.width/2;
         corY2=trackRect2.y+trackRect2.height/2;
-        emit monitorValue2(QString("x: %1, y: %2").arg(corX2).arg(corY2));
+        emit monitorValue2x(QString("%1").arg(corX2));
+        emit monitorValue2y(QString("%1").arg(corY2));
        }
        emit CameraOn(QString("Włączona"));
 

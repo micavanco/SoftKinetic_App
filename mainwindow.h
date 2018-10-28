@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QTime>
 #include <QTextStream>
+#include <QFileDialog>
 
 
 namespace Ui {
@@ -50,6 +51,7 @@ private slots:
     void on_closepushButton_3_pressed();
 
     void on_cameraviewpushButton_2_pressed();
+    void on_cameraviewpushButton_8_pressed();
 
     void onRubberBandChanged(QRect rect,
     QPointF frScn, QPointF toScn);
@@ -69,6 +71,20 @@ private slots:
     void on_blueSlider1_valueChanged(int value);
     void on_blueSlider2_valueChanged(int value);
     void on_blueSlider3_valueChanged(int value);
+
+    void on_analyseButton_pressed();
+
+    void on_inTimeRadio_pressed();
+
+    void on_inSpaceRadio_pressed();
+
+    void on_in2filesRadio_pressed();
+
+    void on_analyseProcessButton_pressed();
+
+    void on_openFile1_pressed();
+
+    void on_openFile2_pressed();
 
 signals:
     void mouseOnScreen();

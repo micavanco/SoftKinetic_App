@@ -135,12 +135,64 @@ QPushButton#cameraviewpushButton_2:disabled
     font-size: 11px;
 }
 
+QPushButton#cameraviewpushButton_8
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #6d645f;
+    border-width: 2px 2px 2px 2px;
+    border-radius: 3px;
+    border-color: black;
+    font-family: "Century Gothic";
+    color:  #f2f2f2;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+
+QPushButton#cameraviewpushButton_8:hover
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #b6afab;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 2px;
+    border-color: black;
+    font-family: "Century Gothic";
+    color:  #f2f2f2;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+QPushButton#cameraviewpushButton_8:disabled
+{
+    padding: 2px 2px;
+    border: 1px solid rgba(0,0,0,.1);
+    background-color: #c5babf;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 2px;
+    border-color: grey;
+    font-family: "Century Gothic";
+    color:  white;
+    font-weight: bold, 600;
+    font-size: 11px;
+}
+
+
 QGroupBox#recordBox
 {
 background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
     font-family: "Century Gothic";
 border-radius: 12px;
 }
+
+QGroupBox#analyseBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+border-radius: 12px;
+}
+
 
 QGroupBox#menuBox
 {
@@ -174,6 +226,14 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgb
     font-family: "Century Gothic";
     border-radius: 12px;
 }
+
+QGroupBox#analyseModeBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+    border-radius: 12px;
+}
+
 
 QRadioButton
 {

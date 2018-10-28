@@ -26,9 +26,11 @@ signals:
     void newFrame(QPixmap pix);
     void newFrame2(QPixmap pix);
     void newFrame3(QPixmap pix);
-    void monitorValue(QString) const;
+    void monitorValuex(QString) const;
+    void monitorValuey(QString) const;
     void monitorDepthValue(QString) const;
-    void monitorValue2(QString) const;
+    void monitorValue2x(QString) const;
+    void monitorValue2y(QString) const;
     void monitorDepthValue2(QString) const;
     void newTitle(QString) const;
     void newTitle2(QString) const;

@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->cameraSettingsBox->setVisible(false);
     ui->settingsBox->setVisible(false);
     ui->inVideo->installEventFilter(this);
+    ui->analyseBox->setVisible(false);
 
 
     ui->graphicsView->setScene(new QGraphicsScene(this));
@@ -51,9 +52,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&projectionprocessor, SIGNAL(CameraOn(QString)), ui->camstatuslabel_2, SLOT(setText(QString)));
     connect(&projectionprocessor, SIGNAL(CameraOff(QString)), ui->camstatuslabel_2, SLOT(setText(QString)));
-    connect(&projectionprocessor, SIGNAL(monitorValue(QString)), ui->coordinatesLabel_2, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorValuex(QString)), ui->coordinatesLabel1x, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorValuey(QString)), ui->coordinatesLabel1y, SLOT(setText(QString)));
     connect(&projectionprocessor, SIGNAL(monitorDepthValue(QString)), ui->milimeterValueLabel_2, SLOT(setText(QString)));
-    connect(&projectionprocessor, SIGNAL(monitorValue2(QString)), ui->coordinatesLabel_3, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorValue2x(QString)), ui->coordinatesLabel2x, SLOT(setText(QString)));
+    connect(&projectionprocessor, SIGNAL(monitorValue2y(QString)), ui->coordinatesLabel2y, SLOT(setText(QString)));
     connect(&projectionprocessor, SIGNAL(monitorDepthValue2(QString)), ui->milimeterValueLabel_3, SLOT(setText(QString)));
     connect(&projectionprocessor, SIGNAL(newTitle(QString)), ui->objectLabel, SLOT(setText(QString)));
     connect(&projectionprocessor, SIGNAL(newTitle2(QString)), ui->objectLabel2, SLOT(setText(QString)));
@@ -217,6 +220,7 @@ void MainWindow::on_cameraviewDock_visibilityChanged(bool visible)
     {
         ui->cameraviewpushButton->setEnabled(true);
         ui->cameraviewpushButton_2->setEnabled(true);
+        ui->cameraviewpushButton_8->setEnabled(true);
         ui->cameraviewDock->setMinimumSize(0,0);
         ui->cameraviewDock->setMaximumSize(16777215,16777215);
     }else
@@ -306,6 +310,7 @@ void MainWindow::on_testButton_pressed()
     ui->blueColorLabel2->setVisible(false);
     ui->blueSlider3->setVisible(false);
     ui->blueColorLabel3->setVisible(false);
+    ui->analyseBox->setVisible(false);
 }
 
 void MainWindow::on_recordButton_pressed()
@@ -333,6 +338,31 @@ void MainWindow::on_recordButton_pressed()
     ui->blueColorLabel2->setVisible(true);
     ui->blueSlider3->setVisible(true);
     ui->blueColorLabel3->setVisible(true);
+    ui->analyseBox->setVisible(false);
+}
+
+void MainWindow::on_analyseButton_pressed()
+{
+    ui->settingsBox->setVisible(false);
+    ui->redSlider1->setVisible(false);
+    ui->redColorLabel1->setVisible(false);
+    ui->redSlider2->setVisible(false);
+    ui->redColorLabel2->setVisible(false);
+    ui->redSlider3->setVisible(false);
+    ui->redColorLabel3->setVisible(false);
+    ui->blueSlider1->setVisible(false);
+    ui->blueColorLabel1->setVisible(false);
+    ui->blueSlider2->setVisible(false);
+    ui->blueColorLabel2->setVisible(false);
+    ui->blueSlider3->setVisible(false);
+    ui->blueColorLabel3->setVisible(false);
+    ui->recordBox->setVisible(false);
+    ui->line->setVisible(false);
+    ui->graphicsView->setVisible(false);
+    ui->graphicsView_2->setVisible(false);
+    ui->objectLabel->setVisible(false);
+    ui->objectLabel2->setVisible(false);
+    ui->analyseBox->setVisible(true);
 }
 
 void MainWindow::on_openpushButton_2_pressed()
@@ -368,6 +398,14 @@ void MainWindow::on_cameraviewpushButton_2_pressed()
         ui->cameraviewDock->show();
     ui->cameraviewDock->setFloating(false);
     ui->cameraviewpushButton_2->setEnabled(false);
+}
+
+void MainWindow::on_cameraviewpushButton_8_pressed()
+{
+    if(ui->cameraviewDock->isHidden())
+        ui->cameraviewDock->show();
+    ui->cameraviewDock->setFloating(false);
+    ui->cameraviewpushButton_8->setEnabled(false);
 }
 
 
@@ -414,7 +452,8 @@ void MainWindow::on_recordmoveButton_pressed()
 
     streamOut = new QTextStream(file);
     *streamOut << QTime::currentTime().toString("hh:mm:ss")+"\n";
-    *streamOut << "Time [s]    Obiekt 1       Obiekt 2\n";
+    *streamOut << "Time        Obiekt 1      Obiekt 2\n";
+    *streamOut << "[s]    |   [x] : [y]  |  [x] : [y]\n";
 
     timer = new QTimer(this);
     timer->setTimerType(Qt::PreciseTimer);
@@ -430,7 +469,9 @@ void MainWindow::on_recordmoveButton_pressed()
 
 void MainWindow::onTimerTimeout()
 {
-    *streamOut << QString("%1").arg(totalTime-time)+"  -  "+ui->coordinatesLabel_2->text()+"  |  "+ui->coordinatesLabel_2->text()+"\n";
+    *streamOut << QString("%1").arg(totalTime-time)+"|"+ui->coordinatesLabel1x->text()+":"+
+                  ui->coordinatesLabel1y->text()+"|"+ui->coordinatesLabel2x->text()+":"+
+                  ui->coordinatesLabel2y->text()+"\n";
     time -= 0.01;
     ui->timeLabel->setText(QString("%1").arg(time));
     if(time <= 0.0)
@@ -482,3 +523,57 @@ void MainWindow::on_blueSlider3_valueChanged(int value)
     ui->blueColorLabel3->setText(QString("%1").arg(value));
     projectionprocessor.setHueBlue(value);
 }
+
+
+void MainWindow::on_inTimeRadio_pressed()
+{
+    ui->openFile2->setEnabled(false);
+}
+
+void MainWindow::on_inSpaceRadio_pressed()
+{
+    ui->openFile2->setEnabled(false);
+}
+
+void MainWindow::on_in2filesRadio_pressed()
+{
+    ui->openFile2->setEnabled(true);
+}
+
+void MainWindow::on_openFile1_pressed()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 1"), "", "Text File (*.txt)");
+
+    file = new QFile(filename);
+    file->open(QIODevice::ReadOnly | QIODevice::Text);
+
+    streamOut = new QTextStream(file);
+    ui->openFileLabel1->setText("Załadowano plik:\n"+streamOut->readLine()+".txt");
+    streamOut->readLine();
+    streamOut->readLine();
+    QString line;
+    while(!streamOut->atEnd())
+    {
+        line = streamOut->readLine();
+        QStringList list = line.split("|");
+        QStringList obiekt1 = list[1].split(":");
+        QStringList obiekt2 = list[2].split(":");
+
+    }
+
+
+    file->close();
+}
+
+void MainWindow::on_openFile2_pressed()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 2"), "", "Text File (*.txt)");
+    QStringList text = filename.split("/");
+    ui->openFileLabel1->setText("Załadowano plik:\n"+text[text.length()-1]);
+}
+
+void MainWindow::on_analyseProcessButton_pressed()
+{
+    //if((ui->inTimeRadio->isChecked() || ui->inSpaceRadio->isChecked()) && ui-> )
+}
+
