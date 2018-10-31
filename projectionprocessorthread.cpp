@@ -1,7 +1,7 @@
 #include "projectionprocessorthread.h"
 
 ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(parent), hueRed(149), saturationRed(126), valueRed(0),
-  hueBlue(46), saturationBlue(59), valueBlue(102)
+  hueBlue(76), saturationBlue(47), valueBlue(106)
 {
 
 }
@@ -112,7 +112,7 @@ void ProjectionProcessorThread::run()
         corX=trackRect.x+trackRect.width/2;
         corY=trackRect.y+trackRect.height/2;
         emit monitorValuex(QString("%1").arg(corX));
-        emit monitorValuey(QString("%1").arg(corY));
+        emit monitorValuey(QString("%1").arg(480-corY));
        }
 
        if(trackRect2.size().area() > 0)
@@ -135,7 +135,7 @@ void ProjectionProcessorThread::run()
         corX2=trackRect2.x+trackRect2.width/2;
         corY2=trackRect2.y+trackRect2.height/2;
         emit monitorValue2x(QString("%1").arg(corX2));
-        emit monitorValue2y(QString("%1").arg(corY2));
+        emit monitorValue2y(QString("%1").arg(480-corY2));
        }
        emit CameraOn(QString("Włączona"));
 

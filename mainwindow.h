@@ -18,7 +18,10 @@
 #include <QTime>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
 
+QT_CHARTS_USE_NAMESPACE
 
 namespace Ui {
 class MovementAnalyzer;
@@ -52,7 +55,7 @@ private slots:
 
     void on_cameraviewpushButton_2_pressed();
     void on_cameraviewpushButton_8_pressed();
-
+    void on_analysisDock_visibilityChanged(bool visible);
     void onRubberBandChanged(QRect rect,
     QPointF frScn, QPointF toScn);
     void onRubberBandChanged2(QRect rect,
@@ -102,6 +105,24 @@ private:
     QTimer *timer;
     double time;
     double totalTime;
+    double *object1ArrayX;
+    double *object1ArrayY;
+    double *object2ArrayX;
+    double *object2ArrayY;
+    int array1Length;
+    double *object1ArrayX2;
+    double *object1ArrayY2;
+    double *object2ArrayX2;
+    double *object2ArrayY2;
+    QLineSeries *series1Object1;
+    QLineSeries *series1Object2;
+    QLineSeries *series2Object1;
+    QLineSeries *series2Object2;
+    QChart *chart1;
+    QChart *chart2;
+    QChartView *chartView1;
+    QChartView *chartView2;
+    int array2Length;
     QFile *file;
     QTextStream *streamOut;
     QString fileTitle;

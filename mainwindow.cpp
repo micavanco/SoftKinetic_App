@@ -79,6 +79,27 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView_2->fitInView(&pixmap2,Qt::IgnoreAspectRatio);
     ui->graphicsView_2->scene()->addItem(&pixmap2);
 
+    object1ArrayX = nullptr;
+    object1ArrayY = nullptr;
+    object2ArrayX = nullptr;
+    object2ArrayY = nullptr;
+
+    object1ArrayX2 = nullptr;
+    object1ArrayY2 = nullptr;
+    object2ArrayX2 = nullptr;
+    object2ArrayY2 = nullptr;
+
+    series1Object1 = nullptr;
+    series1Object2 = nullptr;
+    series2Object1 = nullptr;
+    series2Object2 = nullptr;
+    chart1 = nullptr;
+    chart2 = nullptr;
+    chartView1 = nullptr;
+    chartView2 = nullptr;
+
+    ui->analysisDock->setVisible(false);
+    this->setGeometry(300,200,800,700);
 
 }
 
@@ -229,7 +250,18 @@ void MainWindow::on_cameraviewDock_visibilityChanged(bool visible)
     }
 }
 
-
+void MainWindow::on_analysisDock_visibilityChanged(bool visible)
+{
+    if(!visible || ui->analysisDock->isFloating())
+    {
+        ui->cameraviewpushButton_8->setEnabled(true);
+        ui->analysisDock->setMinimumSize(0,0);
+        ui->analysisDock->setMaximumSize(16777215,16777215);
+    }else
+    {
+        ui->analysisDock->setMinimumSize(570,570);
+    }
+}
 
 
 void MainWindow::on_normalradioButton_pressed()
@@ -311,6 +343,7 @@ void MainWindow::on_testButton_pressed()
     ui->blueSlider3->setVisible(false);
     ui->blueColorLabel3->setVisible(false);
     ui->analyseBox->setVisible(false);
+    ui->analysisDock->setVisible(false);
 }
 
 void MainWindow::on_recordButton_pressed()
@@ -339,6 +372,7 @@ void MainWindow::on_recordButton_pressed()
     ui->blueSlider3->setVisible(true);
     ui->blueColorLabel3->setVisible(true);
     ui->analyseBox->setVisible(false);
+    ui->analysisDock->setVisible(false);
 }
 
 void MainWindow::on_analyseButton_pressed()
@@ -363,6 +397,8 @@ void MainWindow::on_analyseButton_pressed()
     ui->objectLabel->setVisible(false);
     ui->objectLabel2->setVisible(false);
     ui->analyseBox->setVisible(true);
+    ui->analysisDock->setVisible(true);
+    this->tabifyDockWidget(ui->cameraviewDock, ui->analysisDock);
 }
 
 void MainWindow::on_openpushButton_2_pressed()
@@ -403,8 +439,15 @@ void MainWindow::on_cameraviewpushButton_2_pressed()
 void MainWindow::on_cameraviewpushButton_8_pressed()
 {
     if(ui->cameraviewDock->isHidden())
+    {
         ui->cameraviewDock->show();
+    }
+    if(ui->analysisDock->isHidden())
+    {
+        ui->analysisDock->show();
+    }
     ui->cameraviewDock->setFloating(false);
+    ui->analysisDock->setFloating(false);
     ui->cameraviewpushButton_8->setEnabled(false);
 }
 
@@ -452,6 +495,7 @@ void MainWindow::on_recordmoveButton_pressed()
 
     streamOut = new QTextStream(file);
     *streamOut << QTime::currentTime().toString("hh:mm:ss")+"\n";
+    *streamOut << QString("%1").arg((int)ui->timeSpinBox->value()*10)+"\n";
     *streamOut << "Time        Obiekt 1      Obiekt 2\n";
     *streamOut << "[s]    |   [x] : [y]  |  [x] : [y]\n";
 
@@ -542,6 +586,14 @@ void MainWindow::on_in2filesRadio_pressed()
 
 void MainWindow::on_openFile1_pressed()
 {
+    if(object1ArrayX != nullptr)
+    {
+        delete object1ArrayX;
+        delete object1ArrayY;
+        delete object2ArrayX;
+        delete object2ArrayY;
+    }
+
     QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 1"), "", "Text File (*.txt)");
 
     file = new QFile(filename);
@@ -549,31 +601,119 @@ void MainWindow::on_openFile1_pressed()
 
     streamOut = new QTextStream(file);
     ui->openFileLabel1->setText("Załadowano plik:\n"+streamOut->readLine()+".txt");
+    array1Length = streamOut->readLine().toInt();
     streamOut->readLine();
     streamOut->readLine();
     QString line;
-    while(!streamOut->atEnd())
+    object1ArrayX = new double [array1Length+1];
+    object1ArrayY = new double [array1Length+1];
+    object2ArrayX = new double [array1Length+1];
+    object2ArrayY = new double [array1Length+1];
+    for(int i=0; i < array1Length+1; i++)
     {
         line = streamOut->readLine();
         QStringList list = line.split("|");
         QStringList obiekt1 = list[1].split(":");
         QStringList obiekt2 = list[2].split(":");
-
+        object1ArrayX[i] = obiekt1[0].toDouble();
+        object1ArrayY[i] = obiekt1[1].toDouble();
+        object2ArrayX[i] = obiekt2[0].toDouble();
+        object2ArrayY[i] = obiekt2[1].toDouble();
     }
 
 
     file->close();
+    delete streamOut;
+    delete file;
+
+    if((ui->inTimeRadio->isChecked() || ui->inSpaceRadio->isChecked()) && ui->openFileLabel2->text() == "")
+        ui->analyseProcessButton->setEnabled(true);
+    else if(ui->in2filesRadio->isChecked() && ui->openFileLabel2->text() != "" )
+        ui->analyseProcessButton->setEnabled(true);
+    else
+        ui->analyseProcessButton->setEnabled(false);
 }
 
 void MainWindow::on_openFile2_pressed()
 {
+    if(object1ArrayX2 != nullptr)
+    {
+        delete object1ArrayX2;
+        delete object1ArrayY2;
+        delete object2ArrayX2;
+        delete object2ArrayY2;
+    }
+
     QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 2"), "", "Text File (*.txt)");
-    QStringList text = filename.split("/");
-    ui->openFileLabel1->setText("Załadowano plik:\n"+text[text.length()-1]);
+
+    file = new QFile(filename);
+    file->open(QIODevice::ReadOnly | QIODevice::Text);
+
+    streamOut = new QTextStream(file);
+    ui->openFileLabel2->setText("Załadowano plik:\n"+streamOut->readLine()+".txt");
+    array2Length = streamOut->readLine().toInt();
+    streamOut->readLine();
+    streamOut->readLine();
+    QString line;
+    object1ArrayX2 = new double [array2Length+1];
+    object1ArrayY2 = new double [array2Length+1];
+    object2ArrayX2 = new double [array2Length+1];
+    object2ArrayY2 = new double [array2Length+1];
+    int i=0;
+    while(!streamOut->atEnd() || i>array2Length)
+    {
+        line = streamOut->readLine();
+        QStringList list = line.split("|");
+        QStringList obiekt1 = list[1].split(":");
+        QStringList obiekt2 = list[2].split(":");
+        object1ArrayX2[i] = obiekt1[0].toDouble();
+        object1ArrayY2[i] = obiekt1[1].toDouble();
+        object2ArrayX2[i] = obiekt2[0].toDouble();
+        object2ArrayY2[i++] = obiekt2[1].toDouble();
+    }
+
+
+    file->close();
+    delete streamOut;
+    delete file;
+    if(ui->openFileLabel1->text() != "")
+        ui->analyseProcessButton->setEnabled(true);
+    else
+        ui->analyseProcessButton->setEnabled(false);
 }
 
 void MainWindow::on_analyseProcessButton_pressed()
 {
-    //if((ui->inTimeRadio->isChecked() || ui->inSpaceRadio->isChecked()) && ui-> )
+    if(chart1 != nullptr || chart2 != nullptr)
+    {
+        delete series1Object1;
+        delete series1Object2;
+        delete series2Object1;
+        delete series2Object2;
+        delete chart1;
+        delete chart2;
+        delete chartView1;
+        delete chartView2;
+    }
+    if(ui->inTimeRadio->isChecked())
+    {
+
+        series1Object1 = new QLineSeries();
+
+        for(int i=0; i < array1Length+1; i++)
+            series1Object1->append(i,object1ArrayY[i]);
+
+        chart1 = new QChart();
+        chart1->addSeries(series1Object1);
+        chart1->createDefaultAxes();
+        chart1->setTitle("Wykres ruchu obiektu 1");
+        chart1->setAnimationOptions(QChart::AllAnimations);
+
+        chartView1 = new QChartView(chart1);
+        chartView1->setRenderHint(QPainter::Antialiasing);
+        ui->analysisDock->setWidget(chartView1);
+
+    }
+
 }
 

@@ -4,6 +4,36 @@ QMainWindow#MovementAnalyzer
    background-position: center;
 }
 
+QTabWidget::pane
+{
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, 	x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    	font-family: "Century Gothic";
+	border-radius: 12px;
+}
+
+QTabBar::tab:selected
+{
+	background-color: qlineargradient(spread:pad, x1:0, 	y1:0, 	x2:1, y2:0, stop:1 rgba(255, 130, 255, 56));
+    	font-family: "Century Gothic";
+	border-radius: 14px;
+	width: 99px;
+	height: 30px;
+	border: 1px solid black;
+	margin-right: 8px;
+	
+}
+
+QTabBar::tab:!selected
+{
+	background-color: qlineargradient(spread:pad, x1:0, 	y1:0, 	x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    	font-family: "Century Gothic";
+	border-radius: 14px;
+	width: 100px;
+	height: 30px;
+
+}
+
+
 QLabel
 {
     font-family: "Century Gothic";
