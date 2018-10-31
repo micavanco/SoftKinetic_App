@@ -95,8 +95,6 @@ MainWindow::MainWindow(QWidget *parent) :
     series2Object2 = nullptr;
     chart1 = nullptr;
     chart2 = nullptr;
-    chartView1 = nullptr;
-    chartView2 = nullptr;
 
     ui->analysisDock->setVisible(false);
     this->setGeometry(300,200,800,700);
@@ -344,6 +342,8 @@ void MainWindow::on_testButton_pressed()
     ui->blueColorLabel3->setVisible(false);
     ui->analyseBox->setVisible(false);
     ui->analysisDock->setVisible(false);
+    ui->tabWidget->setVisible(true);
+    ui->cameraviewDock->setWidget(ui->tabWidget);
 }
 
 void MainWindow::on_recordButton_pressed()
@@ -373,6 +373,8 @@ void MainWindow::on_recordButton_pressed()
     ui->blueColorLabel3->setVisible(true);
     ui->analyseBox->setVisible(false);
     ui->analysisDock->setVisible(false);
+    ui->tabWidget->setVisible(true);
+    ui->cameraviewDock->setWidget(ui->tabWidget);
 }
 
 void MainWindow::on_analyseButton_pressed()
@@ -399,6 +401,8 @@ void MainWindow::on_analyseButton_pressed()
     ui->analyseBox->setVisible(true);
     ui->analysisDock->setVisible(true);
     this->tabifyDockWidget(ui->cameraviewDock, ui->analysisDock);
+    ui->tabWidget->setVisible(false);
+    ui->cameraviewDock->setWidget(chart2);
 }
 
 void MainWindow::on_openpushButton_2_pressed()
@@ -596,12 +600,19 @@ void MainWindow::on_openFile1_pressed()
 
     QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 1"), "", "Text File (*.txt)");
 
+    if(filename.isEmpty())return;
+
     file = new QFile(filename);
     file->open(QIODevice::ReadOnly | QIODevice::Text);
 
     streamOut = new QTextStream(file);
     ui->openFileLabel1->setText("Załadowano plik:\n"+streamOut->readLine()+".txt");
     array1Length = streamOut->readLine().toInt();
+    if(array1Length == 0)
+    {
+        ui->openFileLabel1->setText("Nieprawidłowy plik.\nSpróbuj ponownie.");
+        return;
+    }
     streamOut->readLine();
     streamOut->readLine();
     QString line;
@@ -646,12 +657,19 @@ void MainWindow::on_openFile2_pressed()
 
     QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 2"), "", "Text File (*.txt)");
 
+    if(filename.isEmpty())return;
+
     file = new QFile(filename);
     file->open(QIODevice::ReadOnly | QIODevice::Text);
 
     streamOut = new QTextStream(file);
     ui->openFileLabel2->setText("Załadowano plik:\n"+streamOut->readLine()+".txt");
     array2Length = streamOut->readLine().toInt();
+    if(array2Length == 0)
+    {
+        ui->openFileLabel2->setText("Nieprawidłowy plik.\nSpróbuj ponownie.");
+        return;
+    }
     streamOut->readLine();
     streamOut->readLine();
     QString line;
@@ -692,27 +710,31 @@ void MainWindow::on_analyseProcessButton_pressed()
         delete series2Object2;
         delete chart1;
         delete chart2;
-        delete chartView1;
-        delete chartView2;
     }
     if(ui->inTimeRadio->isChecked())
     {
 
         series1Object1 = new QLineSeries();
+        series1Object2 = new QLineSeries();
+        series2Object1 = new QLineSeries();
+        series2Object2 = new QLineSeries();
 
         for(int i=0; i < array1Length+1; i++)
             series1Object1->append(i,object1ArrayY[i]);
 
-        chart1 = new QChart();
-        chart1->addSeries(series1Object1);
-        chart1->createDefaultAxes();
-        chart1->setTitle("Wykres ruchu obiektu 1");
-        chart1->setAnimationOptions(QChart::AllAnimations);
+        for(int i=0; i < array1Length+1; i++)
+            series1Object2->append(i,object2ArrayY[i]);
 
-        chartView1 = new QChartView(chart1);
-        chartView1->setRenderHint(QPainter::Antialiasing);
-        ui->analysisDock->setWidget(chartView1);
+        for(int i=0; i < array1Length+1; i++)
+            series2Object1->append(i,object1ArrayX[i]);
 
+        for(int i=0; i < array1Length+1; i++)
+            series2Object2->append(i,object2ArrayX[i]);
+
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie Y [cm]", array1Length, 480);
+        chart2 = new Chart(series2Object1, series2Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie X [cm]", array1Length, 640);
+        ui->analysisDock->setWidget(chart1);
+        ui->cameraviewDock->setWidget(chart2);
     }
 
 }

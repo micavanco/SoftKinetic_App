@@ -9,6 +9,8 @@
 #include "videoprocessorthread.h"
 #include "depthvideoprocessorthread.h"
 #include "projectionprocessorthread.h"
+#include "chart.h"
+
 #include <QMouseEvent>
 #include <QGraphicsScene>
 #include <QLabel>
@@ -18,7 +20,6 @@
 #include <QTime>
 #include <QTextStream>
 #include <QFileDialog>
-#include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 
 QT_CHARTS_USE_NAMESPACE
@@ -118,10 +119,8 @@ private:
     QLineSeries *series1Object2;
     QLineSeries *series2Object1;
     QLineSeries *series2Object2;
-    QChart *chart1;
-    QChart *chart2;
-    QChartView *chartView1;
-    QChartView *chartView2;
+    Chart *chart1;
+    Chart *chart2;
     int array2Length;
     QFile *file;
     QTextStream *streamOut;
