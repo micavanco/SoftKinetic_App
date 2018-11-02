@@ -121,6 +121,8 @@ private:
     QLineSeries *series2Object2;
     Chart *chart1;
     Chart *chart2;
+    QString fileName1;
+    QString fileName2;
     int array2Length;
     QFile *file;
     QTextStream *streamOut;

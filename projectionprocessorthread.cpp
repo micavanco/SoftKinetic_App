@@ -88,7 +88,8 @@ void ProjectionProcessorThread::run()
        }
 
        cv::Mat disp_mat = c_mat.clone();
-       cv::Mat disp_mat2=disp_mat.clone();
+       cv::Mat disp_mat2 = disp_mat.clone();
+       cv::Mat disp_mat3 = disp_mat.clone();
 
        if(trackRect.size().area() > 0)
        {
@@ -109,6 +110,7 @@ void ProjectionProcessorThread::run()
         CamShift(backProj, trackRect, criteria);
         cvtColor(backProj, disp_mat, CV_GRAY2BGR);
         rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
+        rectangle(disp_mat3, trackRect, Scalar(0, 0, 255));
         corX=trackRect.x+trackRect.width/2;
         corY=trackRect.y+trackRect.height/2;
         emit monitorValuex(QString("%1").arg(corX));
@@ -132,6 +134,7 @@ void ProjectionProcessorThread::run()
          CamShift(backProj2, trackRect2, criteria);
          cvtColor(backProj2, disp_mat2, CV_GRAY2BGR);
          rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
+         rectangle(disp_mat3, trackRect2, Scalar(255, 0, 0));
         corX2=trackRect2.x+trackRect2.width/2;
         corY2=trackRect2.y+trackRect2.height/2;
         emit monitorValue2x(QString("%1").arg(corX2));
@@ -156,6 +159,16 @@ void ProjectionProcessorThread::run()
                  disp_mat2.cols,
                  disp_mat2.rows,
                  disp_mat2.step,
+                 QImage::Format_RGB888)
+                     .rgbSwapped()));
+
+       emit newFrame3(
+            QPixmap::fromImage(
+               QImage(
+                 disp_mat3.data,
+                 disp_mat3.cols,
+                 disp_mat3.rows,
+                 disp_mat3.step,
                  QImage::Format_RGB888)
                      .rgbSwapped()));
 

@@ -250,7 +250,7 @@ void MainWindow::on_cameraviewDock_visibilityChanged(bool visible)
 
 void MainWindow::on_analysisDock_visibilityChanged(bool visible)
 {
-    if(!visible || ui->analysisDock->isFloating())
+    if(ui->analysisDock->isFloating())
     {
         ui->cameraviewpushButton_8->setEnabled(true);
         ui->analysisDock->setMinimumSize(0,0);
@@ -358,7 +358,7 @@ void MainWindow::on_recordButton_pressed()
     ui->cameraSettingsBox->setVisible(false);
     ui->cameraviewpushButton->setEnabled(false);
     ui->cameraviewpushButton_2->setEnabled(false);
-    ui->inVideo->setVisible(false);
+    ui->inVideo->setVisible(true);
     ui->redSlider1->setVisible(true);
     ui->redColorLabel1->setVisible(true);
     ui->redSlider2->setVisible(true);
@@ -499,7 +499,7 @@ void MainWindow::on_recordmoveButton_pressed()
 
     streamOut = new QTextStream(file);
     *streamOut << QTime::currentTime().toString("hh:mm:ss")+"\n";
-    *streamOut << QString("%1").arg((int)ui->timeSpinBox->value()*10)+"\n";
+    *streamOut << QString("%1").arg((int)ui->timeSpinBox->value()*100)+"\n";
     *streamOut << "Time        Obiekt 1      Obiekt 2\n";
     *streamOut << "[s]    |   [x] : [y]  |  [x] : [y]\n";
 
@@ -606,7 +606,8 @@ void MainWindow::on_openFile1_pressed()
     file->open(QIODevice::ReadOnly | QIODevice::Text);
 
     streamOut = new QTextStream(file);
-    ui->openFileLabel1->setText("Załadowano plik:\n"+streamOut->readLine()+".txt");
+    fileName1 = streamOut->readLine();
+    ui->openFileLabel1->setText("Załadowano plik:\n"+fileName1+".txt");
     array1Length = streamOut->readLine().toInt();
     if(array1Length == 0)
     {
@@ -663,7 +664,8 @@ void MainWindow::on_openFile2_pressed()
     file->open(QIODevice::ReadOnly | QIODevice::Text);
 
     streamOut = new QTextStream(file);
-    ui->openFileLabel2->setText("Załadowano plik:\n"+streamOut->readLine()+".txt");
+    fileName2 = streamOut->readLine();
+    ui->openFileLabel2->setText("Załadowano plik:\n"+fileName2+".txt");
     array2Length = streamOut->readLine().toInt();
     if(array2Length == 0)
     {
@@ -677,8 +679,7 @@ void MainWindow::on_openFile2_pressed()
     object1ArrayY2 = new double [array2Length+1];
     object2ArrayX2 = new double [array2Length+1];
     object2ArrayY2 = new double [array2Length+1];
-    int i=0;
-    while(!streamOut->atEnd() || i>array2Length)
+    for(int i=0; i < array2Length+1; i++)
     {
         line = streamOut->readLine();
         QStringList list = line.split("|");
@@ -687,7 +688,7 @@ void MainWindow::on_openFile2_pressed()
         object1ArrayX2[i] = obiekt1[0].toDouble();
         object1ArrayY2[i] = obiekt1[1].toDouble();
         object2ArrayX2[i] = obiekt2[0].toDouble();
-        object2ArrayY2[i++] = obiekt2[1].toDouble();
+        object2ArrayY2[i] = obiekt2[1].toDouble();
     }
 
 
@@ -731,11 +732,51 @@ void MainWindow::on_analyseProcessButton_pressed()
         for(int i=0; i < array1Length+1; i++)
             series2Object2->append(i,object2ArrayX[i]);
 
-        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie Y [cm]", array1Length, 480);
-        chart2 = new Chart(series2Object1, series2Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie X [cm]", array1Length, 640);
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie Y [cm]", array1Length, 480, false);
+        chart2 = new Chart(series2Object1, series2Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie X [cm]", array1Length, 640, false);
         ui->analysisDock->setWidget(chart1);
         ui->cameraviewDock->setWidget(chart2);
-    }
 
+    }else if(ui->inSpaceRadio->isChecked())
+    {
+        series1Object1 = new QLineSeries();
+        series1Object2 = new QLineSeries();
+        series2Object1 = new QLineSeries();
+        series2Object2 = new QLineSeries();
+
+        for(int i=0; i < array1Length+1; i++)
+            series1Object1->append(object1ArrayX[i],object1ArrayY[i]);
+
+        for(int i=0; i < array1Length+1; i++)
+            series1Object2->append(object2ArrayX[i],object2ArrayY[i]);
+
+
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X [cm]", "Położenie Y [cm]", 640, 480, false);
+        chart2 = nullptr;
+        ui->analysisDock->setWidget(chart1);
+    }else
+    {
+        series1Object1 = new QLineSeries();
+        series1Object2 = new QLineSeries();
+        series2Object1 = new QLineSeries();
+        series2Object2 = new QLineSeries();
+
+        for(int i=0; i < array1Length+1; i++)
+            series1Object1->append(object1ArrayX[i],object1ArrayY[i]);
+
+        for(int i=0; i < array1Length+1; i++)
+            series1Object2->append(object2ArrayX[i],object2ArrayY[i]);
+
+        for(int i=0; i < array2Length+1; i++)
+            series2Object1->append(object1ArrayX2[i],object1ArrayY2[i]);
+
+        for(int i=0; i < array2Length+1; i++)
+            series2Object2->append(object2ArrayX2[i],object2ArrayY2[i]);
+
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X [cm]", "Położenie Y [cm]", 640, 480, true
+                           , series2Object1, series2Object2, fileName1, fileName2 );
+        chart2 = nullptr;
+        ui->analysisDock->setWidget(chart1);
+    }
 }
 
