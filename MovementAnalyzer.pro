@@ -46,6 +46,7 @@ FORMS += \
 win32{
 include(c:/OpenCV/opencv.pri)
 include(c:/OpenCV/softkinetic.pri)
+include(c:/OpenCV/fftw.pri)
 }
 
 unix: !macx {

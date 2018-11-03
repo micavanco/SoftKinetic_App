@@ -70,12 +70,15 @@
            <x>19</x>
            <y>40</y>
            <width>151</width>
-           <height>131</height>
+           <height>151</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QPushButton" name="testButton">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="text">
              <string>Testowanie</string>
             </property>
@@ -83,6 +86,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="recordButton">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="text">
              <string>Nagrywanie</string>
             </property>
@@ -90,6 +96,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="analyseButton">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="text">
              <string>Analiza Danych</string>
             </property>
@@ -179,6 +188,9 @@
            <weight>75</weight>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="text">
           <string>Przywróć okno kamery</string>
@@ -621,6 +633,9 @@
            <bold>true</bold>
           </font>
          </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
          <property name="text">
           <string>Przywróć okno kamery</string>
          </property>
@@ -777,7 +792,7 @@
            <x>20</x>
            <y>540</y>
            <width>149</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="cursor">
@@ -1314,6 +1329,9 @@
            <bold>true</bold>
           </font>
          </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
          <property name="text">
           <string>Przywróć okno kamery</string>
          </property>
@@ -1400,17 +1418,41 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>380</y>
+           <y>470</y>
            <width>149</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="cursor">
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="text">
-          <string>Analizuj</string>
+          <string> Generuj wykres</string>
          </property>
+        </widget>
+        <widget class="QGroupBox" name="additionalOptionsBox">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>340</y>
+           <width>151</width>
+           <height>101</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>Dodatkowe opcje</string>
+         </property>
+         <widget class="QWidget" name="verticalLayoutWidget_8">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>20</y>
+            <width>156</width>
+            <height>81</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_8"/>
+         </widget>
         </widget>
        </widget>
       </item>
@@ -1452,12 +1494,12 @@
         <attribute name="title">
          <string>Obiekt 1</string>
         </attribute>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>30</x>
            <y>10</y>
-           <width>641</width>
+           <width>642</width>
            <height>611</height>
           </rect>
          </property>
@@ -1588,7 +1630,7 @@
         <attribute name="title">
          <string>Obiekt 2</string>
         </attribute>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>30</x>

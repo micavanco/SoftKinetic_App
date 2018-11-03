@@ -41,7 +41,7 @@ QLabel
 
 QPushButton
 {
-    padding: 1px 13px;
+    padding: 5px 13px;
     border: 1px solid rgba(0,0,0,.1);
     background-color: #804040;
     font-family: "Century Gothic";
@@ -53,7 +53,7 @@ QPushButton
 
 QPushButton:hover
 {
-    padding: 2px 2px;
+    padding: 5px 13px;
     border: 1px solid rgba(0,0,0,.1);
     background-color: #b26666;
     border-width: 2px 2px 2px 2px;
@@ -67,7 +67,7 @@ QPushButton:hover
 
 QPushButton:disabled
 {
-    padding: 2px 2px;
+    padding: 5px 13px;
     border: 1px solid rgba(0,0,0,.1);
     background-color: #c5babf;
     border-width: 1px 1px 1px 1px;
@@ -263,6 +263,14 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgb
     font-family: "Century Gothic";
     border-radius: 12px;
 }
+
+QGroupBox#additionalOptionsBox
+{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:1 rgba(255, 255, 255, 56));
+    font-family: "Century Gothic";
+    border-radius: 12px;
+}
+
 
 
 QRadioButton

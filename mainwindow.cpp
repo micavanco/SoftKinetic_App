@@ -779,4 +779,3 @@ void MainWindow::on_analyseProcessButton_pressed()
         ui->analysisDock->setWidget(chart1);
     }
 }
-
