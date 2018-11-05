@@ -2,7 +2,8 @@
 
 Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString axisXLabel, QString axisYLabel, int rangeX, int rangeY,
              bool hasMultiFiles, QLineSeries *series3, QLineSeries *series4, QString file1Name, QString file2Name, QWidget *parent)
-    : QChartView(parent), m_countRotation(0), m_isPressed(false), m_rangeX(rangeX), m_rangeY(rangeY)
+    : QChartView(parent), m_countRotation(0), m_isPressed(false), m_rangeX(rangeX), m_rangeY(rangeY), m_series1(series1), m_series2(series2)
+    , m_series3(series3), m_series4(series4)
 {
     m_chart = new QChart(); // utworzenie nowego obiektu wykresu
     if(hasMultiFiles)       // jeżeli przekazywane do konstruktora klasy są dwa pliki to...
@@ -17,14 +18,21 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
         m_chart->addSeries(series3);
         m_chart->addSeries(series4);
         // utworzenie obiektów stylizujących wykresy oraz przypisanie do serii
-        QPen pen1(QBrush(QRgb(0xf40659)), 2); // ustawienie koloru w postaci szesnastkowej i grubości linii
-        series1->setPen(pen1);
-        QPen pen2(QBrush(QRgb(0x0033cc)), 2);
-        series2->setPen(pen2);
-        QPen pen3(QBrush(QRgb(0xe6564c)), 2, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
-        series3->setPen(pen3);
-        QPen pen4(QBrush(QRgb(0x2fbdf5)), 2, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
-        series4->setPen(pen4);
+        m_pen1 = new QPen(QBrush(QRgb(0xf40659)), 2); // ustawienie koloru w postaci szesnastkowej i grubości linii
+        series1->setPen(*m_pen1);
+        m_pen2 = new QPen(QBrush(QRgb(0x0033cc)), 2);
+        series2->setPen(*m_pen2);
+        m_pen3 = new QPen(QBrush(QRgb(0xe6564c)), 2, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+        series3->setPen(*m_pen3);
+        m_pen4 = new QPen(QBrush(QRgb(0x2fbdf5)), 2, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+        series4->setPen(*m_pen4);
+
+        // połączenie sygnałów nacjechania kursorem na wykres z metodą klasy oraz przekazywanie wartości w postaci parametrów funkcji
+        connect(series1, &QLineSeries::hovered, this, &Chart::showWindowCoord);
+        connect(series2, &QLineSeries::hovered, this, &Chart::showWindowCoord);
+        connect(series3, &QLineSeries::hovered, this, &Chart::showWindowCoord);
+        connect(series4, &QLineSeries::hovered, this, &Chart::showWindowCoord);
+
     }else // jeżeli jest przekazywany tylko jeden plik
     {
         series1->setName("Obiekt 1");
@@ -33,12 +41,14 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
         m_chart->addSeries(series2);
 
 
-        QPen pen1(QRgb(0xf40659));
-        pen1.setWidth(2);
-        series1->setPen(pen1);
-        QPen pen2(QRgb(0x0033cc));
-        pen2.setWidth(2);
-        series2->setPen(pen2);
+        m_pen1 = new QPen(QRgb(0xf40659));
+        m_pen1->setWidth(2);
+        series1->setPen(*m_pen1);
+        m_pen2 = new QPen(QRgb(0x0033cc));
+        m_pen2->setWidth(2);
+        series2->setPen(*m_pen2);
+        m_pen3 = new QPen(QRgb(0x0033cc));
+        m_pen4 = new QPen(QRgb(0x0033cc));
         // połączenie sygnałów nacjechania kursorem na wykres z metodą klasy oraz przekazywanie wartości w postaci parametrów funkcji
         connect(series1, &QLineSeries::hovered, this, &Chart::showWindowCoord);
         connect(series2, &QLineSeries::hovered, this, &Chart::showWindowCoord);
@@ -69,6 +79,10 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
 
 Chart::~Chart()
 {
+    delete m_pen1;
+    delete m_pen2;
+    delete m_pen3;
+    delete m_pen4;
     delete m_coord; // usuwanie obiektu wyświetlającego koordynacje kursora
     delete m_chart; // usuwanie obiektu wykresu
 }
@@ -96,11 +110,27 @@ void Chart::wheelEvent(QWheelEvent *event)
     {
         chart()->zoomIn(); // przybliżenie wykresu
         m_countRotation++; // inkrementacja zmiennej przechowującej ilość wykonanych obrotów przybliżających
+        m_pen1->setWidth(m_countRotation+2);
+        m_pen2->setWidth(m_countRotation+2);
+        m_pen3->setWidth(m_countRotation+2);
+        m_pen4->setWidth(m_countRotation+2);
+        m_series1->setPen(*m_pen1);
+        m_series2->setPen(*m_pen2);
+        m_series3->setPen(*m_pen3);
+        m_series4->setPen(*m_pen4);
     }
     else if(m_countRotation) // jeżeli zmienna przechowuje liczby dodatnie to...
     {
         chart()->zoomOut(); // oddal wykres
         m_countRotation--;  // dekrementacja liczb przybliżeń
+        m_pen1->setWidth(m_countRotation+2);
+        m_pen2->setWidth(m_countRotation+2);
+        m_pen3->setWidth(m_countRotation+2);
+        m_pen4->setWidth(m_countRotation+2);
+        m_series1->setPen(*m_pen1);
+        m_series2->setPen(*m_pen2);
+        m_series3->setPen(*m_pen3);
+        m_series4->setPen(*m_pen4);
     }else // jeżeli warość przybliżeń wynosi zero to...
     {
         chart()->axisX()->setRange(0, m_rangeX); // ustaw zakres osi x na domyślny

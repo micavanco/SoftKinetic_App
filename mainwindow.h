@@ -10,6 +10,7 @@
 #include "depthvideoprocessorthread.h"
 #include "projectionprocessorthread.h"
 #include "chart.h"
+#include "fftchart.h"
 
 #include <QMouseEvent>
 #include <QGraphicsScene>
@@ -115,18 +116,20 @@ private:
     double *object1ArrayY2;
     double *object2ArrayX2;
     double *object2ArrayY2;
+    int array2Length;
     QLineSeries *series1Object1;
     QLineSeries *series1Object2;
     QLineSeries *series2Object1;
     QLineSeries *series2Object2;
     Chart *chart1;
     Chart *chart2;
+    FftChart *m_fftChart;
     QString fileName1;
     QString fileName2;
-    int array2Length;
     QFile *file;
     QTextStream *streamOut;
     QString fileTitle;
+    int timeCount;
 };
 
 #endif // MAINWINDOW_H

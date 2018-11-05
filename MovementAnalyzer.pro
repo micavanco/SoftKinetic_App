@@ -30,7 +30,8 @@ SOURCES += \
     depthvideoprocessorthread.cpp \
     camerathread.cpp \
     projectionprocessorthread.cpp \
-    chart.cpp
+    chart.cpp \
+    fftchart.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -38,7 +39,8 @@ HEADERS += \
     depthvideoprocessorthread.h \
     camerathread.h \
     projectionprocessorthread.h \
-    chart.h
+    chart.h \
+    fftchart.h
 
 FORMS += \
         mainwindow.ui

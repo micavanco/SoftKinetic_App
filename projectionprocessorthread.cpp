@@ -87,9 +87,9 @@ void ProjectionProcessorThread::run()
            return;
        }
 
-       cv::Mat disp_mat = c_mat.clone();
-       cv::Mat disp_mat2 = disp_mat.clone();
-       cv::Mat disp_mat3 = disp_mat.clone();
+       cv::Mat disp_mat3 = c_mat.clone();
+       cv::Mat disp_mat2 = disp_mat3.clone();
+       cv::Mat disp_mat = disp_mat2.clone();
 
        if(trackRect.size().area() > 0)
        {
@@ -107,7 +107,7 @@ void ProjectionProcessorThread::run()
 
               updateHistogram = false;
             }
-        CamShift(backProj, trackRect, criteria);
+        meanShift(backProj, trackRect, criteria);
         cvtColor(backProj, disp_mat, CV_GRAY2BGR);
         rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
         rectangle(disp_mat3, trackRect, Scalar(0, 0, 255));
@@ -131,7 +131,7 @@ void ProjectionProcessorThread::run()
 
            updateHistogram2 = false;
          }
-         CamShift(backProj2, trackRect2, criteria);
+         meanShift(backProj2, trackRect2, criteria);
          cvtColor(backProj2, disp_mat2, CV_GRAY2BGR);
          rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
          rectangle(disp_mat3, trackRect2, Scalar(255, 0, 0));
@@ -141,7 +141,7 @@ void ProjectionProcessorThread::run()
         emit monitorValue2y(QString("%1").arg(480-corY2));
        }
        emit CameraOn(QString("Włączona"));
-
+        if(!disp_mat.empty())
        emit newFrame(
             QPixmap::fromImage(
                QImage(
@@ -151,7 +151,7 @@ void ProjectionProcessorThread::run()
                  disp_mat.step,
                  QImage::Format_RGB888)
                      .rgbSwapped()));
-
+        if(!disp_mat2.empty())
        emit newFrame2(
             QPixmap::fromImage(
                QImage(
@@ -161,7 +161,7 @@ void ProjectionProcessorThread::run()
                  disp_mat2.step,
                  QImage::Format_RGB888)
                      .rgbSwapped()));
-
+        if(!disp_mat3.empty())
        emit newFrame3(
             QPixmap::fromImage(
                QImage(

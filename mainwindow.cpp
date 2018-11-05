@@ -95,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent) :
     series2Object2 = nullptr;
     chart1 = nullptr;
     chart2 = nullptr;
+    m_fftChart = nullptr;
 
     ui->analysisDock->setVisible(false);
     this->setGeometry(300,200,800,700);
@@ -499,7 +500,7 @@ void MainWindow::on_recordmoveButton_pressed()
 
     streamOut = new QTextStream(file);
     *streamOut << QTime::currentTime().toString("hh:mm:ss")+"\n";
-    *streamOut << QString("%1").arg((int)ui->timeSpinBox->value()*100)+"\n";
+    *streamOut << QString("%1").arg((int)ui->timeSpinBox->value()*10)+"\n";
     *streamOut << "Time        Obiekt 1      Obiekt 2\n";
     *streamOut << "[s]    |   [x] : [y]  |  [x] : [y]\n";
 
@@ -509,10 +510,11 @@ void MainWindow::on_recordmoveButton_pressed()
     time = ui->timeSpinBox->value();
     totalTime = time;
     ui->timeLabel->setText(QString("%1").arg(time));
-    timer->start(10);
+    timer->start(100);
     ui->timeSpinBox->setEnabled(false);
     ui->closepushButton_3->setEnabled(false);
     ui->recordmoveButton->setEnabled(false);
+    timeCount = time*10+1;
 }
 
 void MainWindow::onTimerTimeout()
@@ -520,9 +522,10 @@ void MainWindow::onTimerTimeout()
     *streamOut << QString("%1").arg(totalTime-time)+"|"+ui->coordinatesLabel1x->text()+":"+
                   ui->coordinatesLabel1y->text()+"|"+ui->coordinatesLabel2x->text()+":"+
                   ui->coordinatesLabel2y->text()+"\n";
-    time -= 0.01;
+    time -= 0.1;
+    timeCount--;
     ui->timeLabel->setText(QString("%1").arg(time));
-    if(time <= 0.0)
+    if(timeCount == 0)
     {
         timer->stop();
         file->flush();
@@ -586,16 +589,18 @@ void MainWindow::on_inSpaceRadio_pressed()
 void MainWindow::on_in2filesRadio_pressed()
 {
     ui->openFile2->setEnabled(true);
+    if(ui->openFileLabel2->text() == "")
+        ui->analyseProcessButton->setEnabled(false);
 }
 
 void MainWindow::on_openFile1_pressed()
 {
     if(object1ArrayX != nullptr)
     {
-        delete object1ArrayX;
-        delete object1ArrayY;
-        delete object2ArrayX;
-        delete object2ArrayY;
+        delete [] object1ArrayX;
+        delete [] object1ArrayY;
+        delete [] object2ArrayX;
+        delete [] object2ArrayY;
     }
 
     QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 1"), "", "Text File (*.txt)");
@@ -650,10 +655,10 @@ void MainWindow::on_openFile2_pressed()
 {
     if(object1ArrayX2 != nullptr)
     {
-        delete object1ArrayX2;
-        delete object1ArrayY2;
-        delete object2ArrayX2;
-        delete object2ArrayY2;
+        delete [] object1ArrayX2;
+        delete [] object1ArrayY2;
+        delete [] object2ArrayX2;
+        delete [] object2ArrayY2;
     }
 
     QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 2"), "", "Text File (*.txt)");
@@ -711,6 +716,7 @@ void MainWindow::on_analyseProcessButton_pressed()
         delete series2Object2;
         delete chart1;
         delete chart2;
+        delete m_fftChart;
     }
     if(ui->inTimeRadio->isChecked())
     {
@@ -721,19 +727,20 @@ void MainWindow::on_analyseProcessButton_pressed()
         series2Object2 = new QLineSeries();
 
         for(int i=0; i < array1Length+1; i++)
-            series1Object1->append(i,object1ArrayY[i]);
+            series1Object1->append((double)i/10,object1ArrayY[i]);
 
         for(int i=0; i < array1Length+1; i++)
-            series1Object2->append(i,object2ArrayY[i]);
+            series1Object2->append((double)i/10,object2ArrayY[i]);
 
         for(int i=0; i < array1Length+1; i++)
-            series2Object1->append(i,object1ArrayX[i]);
+            series2Object1->append((double)i/10,object1ArrayX[i]);
 
         for(int i=0; i < array1Length+1; i++)
-            series2Object2->append(i,object2ArrayX[i]);
+            series2Object2->append((double)i/10,object2ArrayX[i]);
 
-        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie Y [cm]", array1Length, 480, false);
-        chart2 = new Chart(series2Object1, series2Object2, "Wykres położenia od czasu", "Czas [ms]", "Położenie X [cm]", array1Length, 640, false);
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie Y [cm]", array1Length/10, 480, false);
+        chart2 = new Chart(series2Object1, series2Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie X [cm]", array1Length/10, 640, false);
+        m_fftChart = nullptr;
         ui->analysisDock->setWidget(chart1);
         ui->cameraviewDock->setWidget(chart2);
 
@@ -753,6 +760,7 @@ void MainWindow::on_analyseProcessButton_pressed()
 
         chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X [cm]", "Położenie Y [cm]", 640, 480, false);
         chart2 = nullptr;
+        m_fftChart = nullptr;
         ui->analysisDock->setWidget(chart1);
     }else
     {
@@ -776,6 +784,8 @@ void MainWindow::on_analyseProcessButton_pressed()
         chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X [cm]", "Położenie Y [cm]", 640, 480, true
                            , series2Object1, series2Object2, fileName1, fileName2 );
         chart2 = nullptr;
+        m_fftChart = new FftChart(object1ArrayY, object1ArrayY2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "1", "Amplituda położenia Y");
         ui->analysisDock->setWidget(chart1);
+        ui->cameraviewDock->setWidget(m_fftChart);
     }
 }

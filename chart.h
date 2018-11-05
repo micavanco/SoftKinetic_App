@@ -29,6 +29,14 @@ private:
     int     m_rangeX;                   // maksymalny zakres osi x
     int     m_rangeY;                   // maksymalny zakres osi y
     QGraphicsTextItem *m_coord;         // okno wyświetlające położenie x i y nad którym znajduje się kursor
+    QPen   *m_pen1;
+    QPen   *m_pen2;
+    QPen   *m_pen3;
+    QPen   *m_pen4;
+    QLineSeries *m_series1;
+    QLineSeries *m_series2;
+    QLineSeries *m_series3;
+    QLineSeries *m_series4;
 
     void wheelEvent(QWheelEvent *event);        // metoda obsługi zdarzeń pokrętła myszki
     void mousePressEvent(QMouseEvent *event);   // metoda obsługi zdarzeń naciśnięcia klawisza myszki
