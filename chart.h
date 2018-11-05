@@ -23,6 +23,7 @@ public slots:
 
 private:
     QChart *m_chart;
+    bool    m_hasMultiFiles;
     int     m_countRotation;            // zmienna ograniczająca oddalanie widoku wykresu
     bool    m_isPressed;                // sprawdzenie czy jest wciśnięty klawisz
     QPoint  m_pos;                      // pozycja kursora po wciśnięciu lewego przycisku myszy

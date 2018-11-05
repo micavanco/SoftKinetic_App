@@ -12,12 +12,16 @@ static cv::Mat d_mat;
 // New color sample event handler
 void onNewColorSample(DepthSense::ColorNode node, DepthSense::ColorNode::NewSampleReceivedData data)
 {
-    int w, h;
-    DepthSense::FrameFormat_toResolution(data.captureConfiguration.frameFormat, &w, &h);
+    if(data.colorMap.size() != 0)
+    {
+        int w, h;
+        DepthSense::FrameFormat_toResolution(data.captureConfiguration.frameFormat, &w, &h);
 
-    cv::Mat color_mat(h, w, CV_8UC3);
-    memcpy(color_mat.data, data.colorMap, w*h * 3);
-    c_mat=color_mat;
+        cv::Mat color_mat(h, w, CV_8UC3);
+
+        memcpy(color_mat.data, data.colorMap, w*h * 3);
+        c_mat=color_mat;
+    }
 }
 
 /*

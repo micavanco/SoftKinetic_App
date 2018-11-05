@@ -3,7 +3,7 @@
 Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString axisXLabel, QString axisYLabel, int rangeX, int rangeY,
              bool hasMultiFiles, QLineSeries *series3, QLineSeries *series4, QString file1Name, QString file2Name, QWidget *parent)
     : QChartView(parent), m_countRotation(0), m_isPressed(false), m_rangeX(rangeX), m_rangeY(rangeY), m_series1(series1), m_series2(series2)
-    , m_series3(series3), m_series4(series4)
+    , m_series3(series3), m_series4(series4), m_hasMultiFiles(hasMultiFiles)
 {
     m_chart = new QChart(); // utworzenie nowego obiektu wykresu
     if(hasMultiFiles)       // jeżeli przekazywane do konstruktora klasy są dwa pliki to...
@@ -112,12 +112,15 @@ void Chart::wheelEvent(QWheelEvent *event)
         m_countRotation++; // inkrementacja zmiennej przechowującej ilość wykonanych obrotów przybliżających
         m_pen1->setWidth(m_countRotation+2);
         m_pen2->setWidth(m_countRotation+2);
-        m_pen3->setWidth(m_countRotation+2);
-        m_pen4->setWidth(m_countRotation+2);
         m_series1->setPen(*m_pen1);
         m_series2->setPen(*m_pen2);
-        m_series3->setPen(*m_pen3);
-        m_series4->setPen(*m_pen4);
+        if(m_hasMultiFiles)
+        {
+            m_pen3->setWidth(m_countRotation+2);
+            m_pen4->setWidth(m_countRotation+2);
+            m_series3->setPen(*m_pen3);
+            m_series4->setPen(*m_pen4);
+        }
     }
     else if(m_countRotation) // jeżeli zmienna przechowuje liczby dodatnie to...
     {
@@ -125,12 +128,15 @@ void Chart::wheelEvent(QWheelEvent *event)
         m_countRotation--;  // dekrementacja liczb przybliżeń
         m_pen1->setWidth(m_countRotation+2);
         m_pen2->setWidth(m_countRotation+2);
-        m_pen3->setWidth(m_countRotation+2);
-        m_pen4->setWidth(m_countRotation+2);
         m_series1->setPen(*m_pen1);
         m_series2->setPen(*m_pen2);
-        m_series3->setPen(*m_pen3);
-        m_series4->setPen(*m_pen4);
+        if(m_hasMultiFiles)
+        {
+            m_pen3->setWidth(m_countRotation+2);
+            m_pen4->setWidth(m_countRotation+2);
+            m_series3->setPen(*m_pen3);
+            m_series4->setPen(*m_pen4);
+        }
     }else // jeżeli warość przybliżeń wynosi zero to...
     {
         chart()->axisX()->setRange(0, m_rangeX); // ustaw zakres osi x na domyślny

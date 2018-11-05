@@ -738,8 +738,8 @@ void MainWindow::on_analyseProcessButton_pressed()
         for(int i=0; i < array1Length+1; i++)
             series2Object2->append((double)i/10,object2ArrayX[i]);
 
-        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie Y [cm]", array1Length/10, 480, false);
-        chart2 = new Chart(series2Object1, series2Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie X [cm]", array1Length/10, 640, false);
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie Y ", array1Length/10, 480, false);
+        chart2 = new Chart(series2Object1, series2Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie X ", array1Length/10, 640, false);
         m_fftChart = nullptr;
         ui->analysisDock->setWidget(chart1);
         ui->cameraviewDock->setWidget(chart2);
@@ -758,7 +758,7 @@ void MainWindow::on_analyseProcessButton_pressed()
             series1Object2->append(object2ArrayX[i],object2ArrayY[i]);
 
 
-        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X [cm]", "Położenie Y [cm]", 640, 480, false);
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X ", "Położenie Y ", 640, 480, false);
         chart2 = nullptr;
         m_fftChart = nullptr;
         ui->analysisDock->setWidget(chart1);
@@ -781,7 +781,7 @@ void MainWindow::on_analyseProcessButton_pressed()
         for(int i=0; i < array2Length+1; i++)
             series2Object2->append(object2ArrayX2[i],object2ArrayY2[i]);
 
-        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X [cm]", "Położenie Y [cm]", 640, 480, true
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X ", "Położenie Y ", 640, 480, true
                            , series2Object1, series2Object2, fileName1, fileName2 );
         chart2 = nullptr;
         m_fftChart = new FftChart(object1ArrayY, object1ArrayY2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "1", "Amplituda położenia Y");
