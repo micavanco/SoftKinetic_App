@@ -345,6 +345,8 @@ void MainWindow::on_testButton_pressed()
     ui->analysisDock->setVisible(false);
     ui->tabWidget->setVisible(true);
     ui->cameraviewDock->setWidget(ui->tabWidget);
+    ui->tabWidget->removeTab(1);
+    ui->tabWidget->removeTab(0);
 }
 
 void MainWindow::on_recordButton_pressed()
@@ -376,6 +378,8 @@ void MainWindow::on_recordButton_pressed()
     ui->analysisDock->setVisible(false);
     ui->tabWidget->setVisible(true);
     ui->cameraviewDock->setWidget(ui->tabWidget);
+    ui->tabWidget->insertTab(0, ui->tab_23, "Obiekt 1");
+    ui->tabWidget->insertTab(1, ui->tab_24, "Obiekt 2");
 }
 
 void MainWindow::on_analyseButton_pressed()
@@ -643,7 +647,7 @@ void MainWindow::on_openFile1_pressed()
     delete streamOut;
     delete file;
 
-    if((ui->inTimeRadio->isChecked() || ui->inSpaceRadio->isChecked()) && ui->openFileLabel2->text() == "")
+    if(ui->inTimeRadio->isChecked() || ui->inSpaceRadio->isChecked())
         ui->analyseProcessButton->setEnabled(true);
     else if(ui->in2filesRadio->isChecked() && ui->openFileLabel2->text() != "" )
         ui->analyseProcessButton->setEnabled(true);

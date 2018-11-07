@@ -111,10 +111,10 @@ void Chart::wheelEvent(QWheelEvent *event)
         chart()->zoomIn(); // przybliżenie wykresu
         m_countRotation++; // inkrementacja zmiennej przechowującej ilość wykonanych obrotów przybliżających
         m_pen1->setWidth(m_countRotation+2);
-        m_pen2->setWidth(m_countRotation+2);
+        m_pen2->setWidth(m_countRotation+2);// zwiekszanie grubości linii podczas przybliżania
         m_series1->setPen(*m_pen1);
         m_series2->setPen(*m_pen2);
-        if(m_hasMultiFiles)
+        if(m_hasMultiFiles)// jeżeli mamy dane z dwóch plików...
         {
             m_pen3->setWidth(m_countRotation+2);
             m_pen4->setWidth(m_countRotation+2);
@@ -127,10 +127,10 @@ void Chart::wheelEvent(QWheelEvent *event)
         chart()->zoomOut(); // oddal wykres
         m_countRotation--;  // dekrementacja liczb przybliżeń
         m_pen1->setWidth(m_countRotation+2);
-        m_pen2->setWidth(m_countRotation+2);
+        m_pen2->setWidth(m_countRotation+2);// zmniejszenie grubości linii podczas oddalania
         m_series1->setPen(*m_pen1);
         m_series2->setPen(*m_pen2);
-        if(m_hasMultiFiles)
+        if(m_hasMultiFiles)// jeżeli mamy dane z dwóch plików...
         {
             m_pen3->setWidth(m_countRotation+2);
             m_pen4->setWidth(m_countRotation+2);

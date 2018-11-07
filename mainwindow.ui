@@ -508,7 +508,7 @@
            <x>20</x>
            <y>140</y>
            <width>151</width>
-           <height>151</height>
+           <height>231</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -621,7 +621,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>290</y>
+           <y>380</y>
            <width>151</width>
            <height>41</height>
           </rect>
@@ -644,7 +644,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>330</y>
+           <y>430</y>
            <width>151</width>
            <height>106</height>
           </rect>
@@ -790,7 +790,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>540</y>
+           <y>670</y>
            <width>149</width>
            <height>31</height>
           </rect>
@@ -806,7 +806,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>430</y>
+           <y>550</y>
            <width>151</width>
            <height>108</height>
           </rect>
@@ -1487,6 +1487,9 @@
          <height>700</height>
         </size>
        </property>
+       <property name="cursor">
+        <cursorShape>ArrowCursor</cursorShape>
+       </property>
        <property name="currentIndex">
         <number>2</number>
        </property>
@@ -1620,6 +1623,9 @@
               <width>640</width>
               <height>480</height>
              </size>
+            </property>
+            <property name="cursor" stdset="0">
+             <cursorShape>CrossCursor</cursorShape>
             </property>
            </widget>
           </item>
@@ -1756,6 +1762,9 @@
               <width>640</width>
               <height>480</height>
              </size>
+            </property>
+            <property name="cursor" stdset="0">
+             <cursorShape>CrossCursor</cursorShape>
             </property>
            </widget>
           </item>
