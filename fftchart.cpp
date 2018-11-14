@@ -2,7 +2,7 @@
 
 FftChart::FftChart(double *series1, double *series2, int range1, int range2,QString title, QString file1Name, QString file2Name,
                    QString whichObject, QString whichAxis, QWidget *parent)
-    : QChartView(parent), m_countRotation(0), m_isPressed(false)
+    : QChartView(parent), m_countRotation(0), m_isPressed(false), m_maxDiff(0), m_countMatch(0)
 {
     int smallerRange;
     // sprawdzenie zakresu czasu przebiegu oraz dopasowanie do fft, czyli do wartości potegi 2
@@ -65,38 +65,88 @@ FftChart::FftChart(double *series1, double *series2, int range1, int range2,QStr
     m_series1 = new QLineSeries();
     m_series2 = new QLineSeries();
 
+    // zmienna pomocnicza do określenia czy mamy nieprawidłowy przebieg
+    bool isFalse1=false, isFalse2=false;
+
     // początkowa maksymalna wartość wzmocnienia na osi y
     float yMax = 1;
     // zmienna określająca częstotliwość
     double f = 1;
+    // zmienna określająca moduł z wartości zespolonych
+    double c1, c2;
+    // zmienna będaca różnicą dwóch sygnałów
+    double diff;
+
+    double a,b;
     // utworzenie serii danych do wykresu
     for(int i=0; i < m_range1/2; i++)
     {
         // obliczenie częstotliwości
         f = i*smallerRange/m_range1;
-        // obliczenie modułu z wartości zespolonej dla serii 1
-        double a = m_fftvalues1[i];
-        double b = 0.0;
-        if(i>0 && i<range1/2)
-            b = m_fftvalues1[m_range1/2+i];
+        if(!isFalse1)
+        {
+            // obliczenie modułu z wartości zespolonej dla serii 1
+            a = m_fftvalues1[i];
+            b = 0.0;
+            if(i>0 && i<range1/2)
+                b = m_fftvalues1[m_range1/2+i];
 
-        double c = qSqrt(a*a+b*b) / m_range1;
-        c = 0.15*qLn(c);
-        if(c < 0)c*=-1;
-        m_series1->append(f, c);
-        if((c>yMax)&&(i>0))yMax=c;
-        // obliczenie modułu z wartości zespolonej dla serii 2
-        a = m_fftvalues2[i];
-        b = 0.0;
-        if(i>0 && i<range1/2)
-            b = m_fftvalues2[m_range1/2+i];
+            c1 = qSqrt(a*a+b*b) / m_range1;
+            c1 = 0.15*qLn(c1);
+            if(c1 < 0)c1*=-1;
+            if(c1 > 1 || c1 < 0)isFalse1=true;
+            m_series1->append(f, c1);
+            if((c1>yMax)&&(i>0))yMax=c1;
+        }
 
-        c = qSqrt(a*a+b*b) / m_range1;
-        c = 0.15*qLn(c);
-        if(c < 0)c*=-1;
-        m_series2->append(f, c);
-        if((c>yMax)&&(i>0))yMax=c;
+        if(!isFalse2) // jeżeli przebieg jest prawidłowy to...
+        {
+            // obliczenie modułu z wartości zespolonej dla serii 2
+            a = m_fftvalues2[i];
+            b = 0.0;
+            if(i>0 && i<range1/2)
+                b = m_fftvalues2[m_range1/2+i];
+
+            c2 = qSqrt(a*a+b*b) / m_range1;
+            c2 = 0.15*qLn(c2);
+            if(c2 < 0)c2*=-1;
+            if(c2 > 1 || c2 < 0)isFalse2=true;
+            m_series2->append(f, c2);
+            if((c2>yMax)&&(i>0))yMax=c2;
+            if(c1>c2)diff=c1-c2;
+            else diff=c2-c1;
+            if(diff>m_maxDiff)
+            {
+                m_maxDiff=diff;
+                m_maxHz=f;
+            }
+            if(diff<=0.05)m_countMatch++;
+        }
+
     }
+    if(isFalse1 || isFalse2)// sprawdzenie czy któryś z przebiegów zawiera nieprawidłowe dane
+        m_resultsMessage = QString("<span style=\"color:#ff0000;\">Brak ruchu obiektu lub/i<br/>nieprawidłowe dane...</span>");
+    else
+    {
+        m_percentage = (double)m_countMatch/(double)(m_range1/2)*100;// obliczanie podobieństwa
+        if(m_countMatch>=(m_range1/2)*0.95)// jeżeli większe niż 95%
+            m_resultsMessage = QString("<span style=\"color:#000000;\">Przebiegi są podobne w:<br/>                <b>%1</b> %<br/></span>"
+                                       "<span style=\"color:#aa0000;\">Są takie same, <br/>bądź wykonane <br/>przez tę samą osobę.<br/></span>"
+                                       "<span style=\"color:#000000;\">Maksymalna różnica \namplitudy wynosi:<br/>                <b>%2</b><br/></span>"
+                                       "<span style=\"color:#000000;\">na częstotliwości: <b>%3</b> Hz</span>")
+                    .arg(m_percentage, 0, 'f', 2)
+                    .arg(m_maxDiff, 0, 'f', 3)
+                    .arg(m_maxHz);
+        else if(m_countMatch<(m_range1/2)*0.95)
+            m_resultsMessage = QString("<span style=\"color:#000000;\">Przebiegi są podobne w:<br/>                <b>%1</b> %<br/></span>"
+                                       "<span style=\"color:#aa0000;\">Przebiegi odbiegają <br/>od siebie.<br/></span>"
+                                       "<span style=\"color:#000000;\">Maksymalna różnica <br/>amplitudy wynosi:<br/>                <b>%2</b><br/></span>"
+                                       "<span style=\"color:#000000;\">na częstotliwości: <b>%3</b> Hz</span>")
+                    .arg(m_percentage, 0, 'f', 2)
+                    .arg(m_maxDiff, 0, 'f', 3)
+                    .arg(m_maxHz);
+    }
+
 
     delete [] m_fftvalues1;
     delete [] m_fftvalues2;

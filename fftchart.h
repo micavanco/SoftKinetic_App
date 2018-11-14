@@ -17,6 +17,9 @@ public:
     explicit FftChart(double *series1, double *series2, int range1, int range2, QString title, QString file1Name, QString file2Name,
                       QString whichObject, QString whichAxis, QWidget *parent = nullptr);
     ~FftChart();
+
+    float getMaxDiff() const {return m_maxDiff;} // metoda zwracająca m_maxDiff
+    QString resultsMessage() const {return m_resultsMessage;} // metoda zwracająca informację odnośnie analizy dwóch sygnałów
 signals:
 
 public slots:
@@ -34,6 +37,11 @@ private:
     QLineSeries   *m_series2;
     QPen   *m_pen1;
     QPen   *m_pen2;
+    float   m_maxDiff;                  // zmienna okreslająca wartość maksymalnej róznicy pomiędzy dwoma sygnałami
+    int     m_maxHz;                    // częstotliwość przy maksymalnej różnicy
+    QString m_resultsMessage;           // informacja odnośnie analizy dwóch sygnałów
+    int     m_countMatch;               // zmienna zawierająca ilość dopasowanych próbek
+    double  m_percentage;               // na ile procent przebiegi są podobne
 
 
     void wheelEvent(QWheelEvent *event);        // metoda obsługi zdarzeń pokrętła myszki

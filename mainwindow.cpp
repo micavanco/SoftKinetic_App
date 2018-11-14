@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->settingsBox->setVisible(false);
     ui->inVideo->installEventFilter(this);
     ui->analyseBox->setVisible(false);
+    ui->additionalOptionsBox->setEnabled(false);
 
 
     ui->graphicsView->setScene(new QGraphicsScene(this));
@@ -583,16 +584,19 @@ void MainWindow::on_blueSlider3_valueChanged(int value)
 void MainWindow::on_inTimeRadio_pressed()
 {
     ui->openFile2->setEnabled(false);
+    ui->additionalOptionsBox->setEnabled(false);
 }
 
 void MainWindow::on_inSpaceRadio_pressed()
 {
     ui->openFile2->setEnabled(false);
+    ui->additionalOptionsBox->setEnabled(false);
 }
 
 void MainWindow::on_in2filesRadio_pressed()
 {
     ui->openFile2->setEnabled(true);
+    ui->additionalOptionsBox->setEnabled(true);
     if(ui->openFileLabel2->text() == "")
         ui->analyseProcessButton->setEnabled(false);
 }
@@ -788,8 +792,16 @@ void MainWindow::on_analyseProcessButton_pressed()
         chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X ", "Położenie Y ", 640, 480, true
                            , series2Object1, series2Object2, fileName1, fileName2 );
         chart2 = nullptr;
-        m_fftChart = new FftChart(object1ArrayY, object1ArrayY2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "1", "Amplituda położenia Y");
+        if(ui->obj1YRadio->isChecked())
+            m_fftChart = new FftChart(object1ArrayY, object1ArrayY2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "1", "Amplituda położenia Y");
+        else if(ui->obj2YRadio->isChecked())
+            m_fftChart = new FftChart(object2ArrayY, object2ArrayY2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "2", "Amplituda położenia Y");
+        else if(ui->obj1XRadio->isChecked())
+            m_fftChart = new FftChart(object1ArrayX, object1ArrayX2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "1", "Amplituda położenia X");
+        else
+            m_fftChart = new FftChart(object2ArrayX, object2ArrayX2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "2", "Amplituda położenia X");
         ui->analysisDock->setWidget(chart1);
         ui->cameraviewDock->setWidget(m_fftChart);
+        ui->resultsLabel->setText(m_fftChart->resultsMessage());
     }
 }

@@ -106,6 +106,43 @@
           </item>
          </layout>
         </widget>
+        <widget class="QLabel" name="label_6">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>650</y>
+           <width>131</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Javanese Text</family>
+          </font>
+         </property>
+         <property name="text">
+          <string>Created by:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_7">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>670</y>
+           <width>131</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Gabriola</family>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Michał Olech</string>
+         </property>
+        </widget>
        </widget>
       </item>
       <item>
@@ -1418,7 +1455,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>470</y>
+           <y>510</y>
            <width>149</width>
            <height>31</height>
           </rect>
@@ -1436,11 +1473,11 @@
            <x>20</x>
            <y>340</y>
            <width>151</width>
-           <height>101</height>
+           <height>141</height>
           </rect>
          </property>
          <property name="title">
-          <string>Dodatkowe opcje</string>
+          <string>Rodzaj wykresu FFT</string>
          </property>
          <widget class="QWidget" name="verticalLayoutWidget_8">
           <property name="geometry">
@@ -1448,10 +1485,77 @@
             <x>0</x>
             <y>20</y>
             <width>156</width>
-            <height>81</height>
+            <height>121</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8"/>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QRadioButton" name="obj1YRadio">
+             <property name="text">
+              <string>Obiekt 1, oś Y</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="obj2YRadio">
+             <property name="text">
+              <string>Obiekt 2, oś Y</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="obj1XRadio">
+             <property name="text">
+              <string>Obiekt 1, oś X</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="obj2XRadio">
+             <property name="text">
+              <string>Obiekt 2, oś X</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QGroupBox" name="resultsBox">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>560</y>
+           <width>151</width>
+           <height>151</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>Rezultat analizy</string>
+         </property>
+         <widget class="QWidget" name="verticalLayoutWidget_9">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>20</y>
+            <width>131</width>
+            <height>131</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_12">
+           <item>
+            <widget class="QLabel" name="resultsLabel">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </widget>
        </widget>
