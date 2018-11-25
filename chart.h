@@ -13,9 +13,12 @@ class Chart : public QChartView
     Q_OBJECT
 public:
     explicit Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString axisXLabel, QString axisYLabel, int rangeX, int rangeY,
-                   bool hasMultiFiles, QLineSeries *series3 = nullptr, QLineSeries *series4 = nullptr, QString file1Name = "", QString file2Name = "",
+                   bool hasMultiFiles, QString file1Name = "1", QString file2Name = "2", QLineSeries *series3 = nullptr, QLineSeries *series4 = nullptr,
                    QWidget *parent = nullptr);
     ~Chart();
+
+    double getSurfaceInfo1(){return m_surface1;}
+    double getSurfaceInfo2(){return m_surface2;}
 signals:
 
 public slots:
@@ -38,7 +41,11 @@ private:
     QLineSeries *m_series2;
     QLineSeries *m_series3;
     QLineSeries *m_series4;
+    double m_surface1;                  // pole powierzchni pierwszego przebiegu
+    double m_surface2;                  // pole powierzchni drugiego przebiegu
 
+
+    void calculateIntegral();             // obliczenie pola powierzchni za pomocą metody całkowej
     void wheelEvent(QWheelEvent *event);        // metoda obsługi zdarzeń pokrętła myszki
     void mousePressEvent(QMouseEvent *event);   // metoda obsługi zdarzeń naciśnięcia klawisza myszki
     void mouseReleaseEvent(QMouseEvent *event); // metoda obsługi zdarzeń puszczenia klawisza myszki

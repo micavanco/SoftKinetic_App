@@ -1,7 +1,7 @@
 #include "chart.h"
 
 Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString axisXLabel, QString axisYLabel, int rangeX, int rangeY,
-             bool hasMultiFiles, QLineSeries *series3, QLineSeries *series4, QString file1Name, QString file2Name, QWidget *parent)
+             bool hasMultiFiles, QString file1Name, QString file2Name, QLineSeries *series3, QLineSeries *series4, QWidget *parent)
     : QChartView(parent), m_countRotation(0), m_isPressed(false), m_rangeX(rangeX), m_rangeY(rangeY), m_series1(series1), m_series2(series2)
     , m_series3(series3), m_series4(series4), m_hasMultiFiles(hasMultiFiles)
 {
@@ -35,8 +35,8 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
 
     }else // jeżeli jest przekazywany tylko jeden plik
     {
-        series1->setName("Obiekt 1");
-        series2->setName("Obiekt 2");
+        series1->setName("Obiekt "+file1Name);
+        series2->setName("Obiekt "+file2Name);
         m_chart->addSeries(series1);
         m_chart->addSeries(series2);
 
@@ -52,6 +52,10 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
         // połączenie sygnałów nacjechania kursorem na wykres z metodą klasy oraz przekazywanie wartości w postaci parametrów funkcji
         connect(series1, &QLineSeries::hovered, this, &Chart::showWindowCoord);
         connect(series2, &QLineSeries::hovered, this, &Chart::showWindowCoord);
+        if(file1Name[0] != "1")
+        {
+
+        }
     }
     // utworznie obiektu modyfikującego czcionkę
     QFont font;
@@ -75,6 +79,8 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
 
     this->setChart(m_chart);    // przypisanie obiektu wykresu do sceny, czyli tej klasy
     this->setCursor(Qt::OpenHandCursor); // ustawienie kursora otwartej dłoni
+
+    calculateIntegral(); // wywołanie metody odpowiedzialnej za obliczenie powierzchni
 }
 
 Chart::~Chart()
@@ -102,6 +108,29 @@ void Chart::showWindowCoord(QPointF point, bool state)
         this->setCursor(Qt::OpenHandCursor); // ustawienie kursora otwartej dłoni
         m_coord->hide(); // ukrycie okna
     }
+}
+// obliczanie pola powierzchni za pomocą metody całkowej - metoda trapezów
+void Chart::calculateIntegral()
+{
+    double surface1 = 0, surface2 = 0;
+    // dy - różnica pomiędzy y1, a y2
+    double y1, y2, dy;
+    for(int i = 0; i < m_rangeX; i++)
+    {
+        // obliczanie powierzchni dla serii 1
+        y1 = m_series1->at(i).y();
+        y2 = m_series1->at(i+1).y();
+        dy = (y2 - y1)/2;
+        surface1 += (y1 + dy);
+        // obliczanie powierzchni dla serii 2
+        y1 = m_series2->at(i).y();
+        y2 = m_series2->at(i+1).y();
+        dy = (y2 - y1)/2;
+        surface2 += (y1 + dy);
+    }
+
+    m_surface1 = surface1;
+    m_surface2 = surface2;
 }
 //  metoda obsługi zdarzeń pokrętła myszki
 void Chart::wheelEvent(QWheelEvent *event)

@@ -45,15 +45,15 @@ FftChart::FftChart(double *series1, double *series2, int range1, int range2,QStr
         else if(range1 >= 4096 && range1 < 8192)
             m_range2 = m_range1 = 4096;
     }
-    // utworzenie dwóch obiektów klasy reprezentującej transformatę Fourier'a
+    // utworzenie dwóch obiektów klasy reprezentującej transformację Fourier'a
     ffft::FFTReal <double> fft_object1 (m_range1);
     ffft::FFTReal <double> fft_object2 (m_range1);
 
-    // utworzenie nowych tablic z danymi na transformatę
+    // utworzenie nowych tablic z danymi na wynik transformacji
     double* m_fftvalues1 = new double [m_range1];
     double* m_fftvalues2 = new double [m_range1];
 
-    // transformata Fourier'a
+    // transformacja Fourier'a
     fft_object1.do_fft(m_fftvalues1, series1);
     fft_object2.do_fft(m_fftvalues2, series2);
 
@@ -183,7 +183,7 @@ FftChart::FftChart(double *series1, double *series2, int range1, int range2,QStr
     m_chart->axisX()->setRange(0, m_range1/2);   // ustawienie zakresu osi x
     m_chart->axisX()->setTitleText("Częstotliwość [Hz]"); // ustawienie tytułu osi x
 
-    m_chart->axisY()->setRange(0, yMax);   // ustawienie zakresu osi y
+    m_chart->axisY()->setRange(0, 1);   // ustawienie zakresu osi y
     m_chart->axisY()->setTitleText(whichAxis); // ustawienie tytułu osi y
 
     m_coord = new QGraphicsTextItem(m_chart); // utworzenie obiektu wyświetlającego koordynacje kursora na wykresie i przypisanie do wykresu

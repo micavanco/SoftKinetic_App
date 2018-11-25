@@ -98,7 +98,8 @@ void ProjectionProcessorThread::run()
        if(trackRect.size().area() > 0)
        {
            cvtColor(disp_mat, hsv, CV_BGR2HSV);
-           cv::inRange(hsv, cv::Scalar(hueRed, saturationRed, valueRed), cv::Scalar(hueRed+30, 255, 255), backProj);
+           cv::inRange(hsv, cv::Scalar(hueRed, saturationRed, valueRed),
+                       cv::Scalar(hueRed+30, 255, 255), backProj);
 
 
          QMutexLocker locker(&rectMutex);
