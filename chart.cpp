@@ -1,8 +1,11 @@
 #include "chart.h"
 
-Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString axisXLabel, QString axisYLabel, int rangeX, int rangeY,
-             bool hasMultiFiles, QString file1Name, QString file2Name, QLineSeries *series3, QLineSeries *series4, QWidget *parent)
-    : QChartView(parent), m_countRotation(0), m_isPressed(false), m_rangeX(rangeX), m_rangeY(rangeY), m_series1(series1), m_series2(series2)
+Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title,
+             QString axisXLabel, QString axisYLabel, int rangeX, int rangeY,
+             bool hasMultiFiles, bool inSpace, QString file1Name,
+             QString file2Name, QLineSeries *series3, QLineSeries *series4, QWidget *parent)
+    : QChartView(parent), m_countRotation(0), m_isPressed(false),
+      m_rangeX(rangeX), m_rangeY(rangeY), m_series1(series1), m_series2(series2)
     , m_series3(series3), m_series4(series4), m_hasMultiFiles(hasMultiFiles)
 {
     m_chart = new QChart(); // utworzenie nowego obiektu wykresu
@@ -52,10 +55,6 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
         // połączenie sygnałów nacjechania kursorem na wykres z metodą klasy oraz przekazywanie wartości w postaci parametrów funkcji
         connect(series1, &QLineSeries::hovered, this, &Chart::showWindowCoord);
         connect(series2, &QLineSeries::hovered, this, &Chart::showWindowCoord);
-        if(file1Name[0] != "1")
-        {
-
-        }
     }
     // utworznie obiektu modyfikującego czcionkę
     QFont font;
@@ -80,7 +79,9 @@ Chart::Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString 
     this->setChart(m_chart);    // przypisanie obiektu wykresu do sceny, czyli tej klasy
     this->setCursor(Qt::OpenHandCursor); // ustawienie kursora otwartej dłoni
 
-    calculateIntegral(); // wywołanie metody odpowiedzialnej za obliczenie powierzchni
+    // jeżeli nie analizujemy wykresów X od Y to oblicz pole
+    if(!inSpace)
+        calculateIntegral(); // wywołanie metody odpowiedzialnej za obliczenie powierzchni
 }
 
 Chart::~Chart()

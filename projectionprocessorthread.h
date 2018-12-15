@@ -15,8 +15,8 @@ public:
     explicit ProjectionProcessorThread(QObject *parent = nullptr);
     void configureColorNode();
     void configureNode(DepthSense::Node node);
-    void configureDepthNode();
-    cv::Mat ModDepthForDisplay(const cv::Mat &mat);
+    //void configureDepthNode(); --- Możliwość przyszłościowego rozwoju aplikacji o nowe funkcje badania głębi
+    //cv::Mat ModDepthForDisplay(const cv::Mat &mat);
 
 signals:
     void inDisplay(QPixmap pixmap);
@@ -69,7 +69,8 @@ private:
 
     void run() override;
     friend void onNewColorSample(DepthSense::DepthNode node, DepthSense::DepthNode::NewSampleReceivedData data);
-    friend void onNewDepthSample2(DepthSense::DepthNode node, DepthSense::DepthNode::NewSampleReceivedData data);
+    //Możliwość przyszłościowego rozwoju aplikacji o nowe funkcje badania głębi
+    //friend void onNewDepthSample2(DepthSense::DepthNode node, DepthSense::DepthNode::NewSampleReceivedData data);
 };
 
 #endif // PROJECTIONPROCESSORTHREAD_H

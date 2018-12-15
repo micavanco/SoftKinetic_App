@@ -6,7 +6,10 @@ VideoProcessorThread::VideoProcessorThread(QObject *parent) : QThread(parent)
 }
 
 static cv::Mat c_mat;
-
+/*
+    Metoda nasłuchująca, wywoływana przy każdorazowym odbiorze nowych danych (jedna klatka obrazu wideo
+    z kamery Softkinetic DS325 w postaci obrazu w przestrzeni kolorów RGB)
+*/
 void onNewColorSample2(DepthSense::ColorNode node, DepthSense::ColorNode::NewSampleReceivedData data)
 {
     if(data.colorMap.size() != 0)
@@ -20,7 +23,9 @@ void onNewColorSample2(DepthSense::ColorNode node, DepthSense::ColorNode::NewSam
         c_mat=color_mat;
     }
 }
-
+/*
+    Metoda konfigurująca parametry transmisji z kamerą SoftKinetic dla przesyłu obrazu w postaci RGB
+*/
 void VideoProcessorThread::configureColorNode()
 {
     DepthSense::ColorNode::Configuration config = m_cnode.getConfiguration();
@@ -66,7 +71,9 @@ void VideoProcessorThread::configureColorNode()
 
     }
 }
-
+/*
+    Metoda konfigurująca parametry transmisji z kamerą SoftKinetic
+*/
 void VideoProcessorThread::configureNode(DepthSense::Node node)
 {
     if ((node.is<DepthSense::ColorNode>()) && (!m_cnode.isSet()))
@@ -76,7 +83,9 @@ void VideoProcessorThread::configureNode(DepthSense::Node node)
         m_context.registerNode(node);
     }
 }
-
+/*
+    Wywołanie wątku dla transmisji obrazu z kamery
+*/
 void VideoProcessorThread::run()
    {
      using namespace cv;

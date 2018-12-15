@@ -513,7 +513,7 @@ void MainWindow::on_recordmoveButton_pressed()
 {
     // pobierz aktualny czas oraz utwórz nowy plik tekstowy z datą w nazwie
     fileTitle = QTime::currentTime().toString("hh_mm_ss");
-    file = new QFile("../MovementAnalyzer/output/"+fileTitle+".txt");
+    file = new QFile("output/"+fileTitle+".txt");
     file->open(QIODevice::ReadWrite | QIODevice::Text);
     // utwórz obiekt do transmisji danych do pliku oraz prześlij dwa wiersze
     streamOut = new QTextStream(file);
@@ -524,6 +524,7 @@ void MainWindow::on_recordmoveButton_pressed()
     // utwórz nowy obiekt zliczający czas oraz połącz go z metodą wywoływaną po każdym upływie 100 ms
     timer = new QTimer(this);
     timer->setTimerType(Qt::PreciseTimer);
+    // połączenie sygnału osiągnięcia maksymalnego czasu przez licznik z metodą
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimerTimeout()));
     time = ui->timeSpinBox->value();
     totalTime = time;
@@ -620,6 +621,12 @@ void MainWindow::on_in2filesRadio_pressed()
 // metoda obsługujaca zdarzenia naciśnięcia przycisku wczytania pliku pierwszego
 void MainWindow::on_openFile1_pressed()
 {
+
+    // wywolanie okna dialogowego do wyboru pliku i przypisanie jego nazwy do zmiennej
+    QString filename = QFileDialog::getOpenFileName(this,
+    tr("Otwórz plik 1"), "", "Text File (*.txt)");
+
+    if(filename.isEmpty())return;// jeżeli nazwwa jest pusta to zakończ wczytywanie pliku
     // jeżeli były już wcześniej wczytane jakieś dane to je usuń
     if(object1ArrayX != nullptr)
     {
@@ -628,10 +635,6 @@ void MainWindow::on_openFile1_pressed()
         delete [] object2ArrayX;
         delete [] object2ArrayY;
     }
-    // wywolanie okna dialogowego do wyboru pliku i przypisanie jego nazwy do zmiennej
-    QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 1"), "", "Text File (*.txt)");
-
-    if(filename.isEmpty())return;// jeżeli nazwwa jest pusta to zakończ wczytywanie pliku
     // otworzenie pliku
     file = new QFile(filename);
     file->open(QIODevice::ReadOnly | QIODevice::Text);
@@ -682,6 +685,11 @@ void MainWindow::on_openFile1_pressed()
 // metoda obsługujaca zdarzenia naciśnięcia przycisku wczytania pliku drugiego
 void MainWindow::on_openFile2_pressed()
 {
+
+    // wywolanie okna dialogowego do wyboru pliku i przypisanie jego nazwy do zmiennej
+    QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 2"), "", "Text File (*.txt)");
+
+    if(filename.isEmpty())return;// jeżeli nazwwa jest pusta to zakończ wczytywanie pliku
     // jeżeli były już wcześniej wczytane jakieś dane to je usuń
     if(object1ArrayX2 != nullptr)
     {
@@ -690,10 +698,6 @@ void MainWindow::on_openFile2_pressed()
         delete [] object2ArrayX2;
         delete [] object2ArrayY2;
     }
-    // wywolanie okna dialogowego do wyboru pliku i przypisanie jego nazwy do zmiennej
-    QString filename = QFileDialog::getOpenFileName(this, tr("Otwórz plik 2"), "", "Text File (*.txt)");
-
-    if(filename.isEmpty())return;// jeżeli nazwwa jest pusta to zakończ wczytywanie pliku
     // otworzenie pliku
     file = new QFile(filename);
     file->open(QIODevice::ReadOnly | QIODevice::Text);
@@ -783,8 +787,15 @@ void MainWindow::on_analyseProcessButton_pressed()
         // ustaw obiekt wykresu jako widżet okna modularnego
         ui->analysisDock->setWidget(chart1);
         ui->cameraviewDock->setWidget(chart2);
+        // wywołanie metod zwracających pole powierzchni przebiegów oraz wyświetlenie informacji
+        ui->resultsLabel->setText(QString("<span style=\"color:#f40659;\">Pole 1 oś Y: <b>%1</b></span>"
+                                          "<br/><span style=\"color:#0033cc;\">Pole 2 oś Y: <b>%2</b></span>"
+                                          "<br/><span style=\"color:#f40659;\">Pole 1 oś X: <b>%3</b></span>"
+                                          "<br/><span style=\"color:#0033cc;\">Pole 2 oś X: <b>%4</b></span>")
+                                   .arg(chart1->getSurfaceInfo1()).arg(chart1->getSurfaceInfo2())
+                                  .arg(chart2->getSurfaceInfo1()).arg(chart2->getSurfaceInfo2()));
 
-    }else if(ui->inSpaceRadio->isChecked())// jeżeli zaznacozny jest przycisk opcji do analizy w przestrzeni osi X i Y
+    }else if(ui->inSpaceRadio->isChecked())// jeżeli zaznaczony jest przycisk opcji do analizy w przestrzeni osi X i Y
     {
         // utwórz nowe obiekty serii danych liniowych
         series1Object1 = new QLineSeries();
@@ -803,7 +814,7 @@ void MainWindow::on_analyseProcessButton_pressed()
             series1Object2->append(object2ArrayX[i],object2ArrayY[i]);
 
         // utwórz nowe obiekty wykresu
-        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X ", "Położenie Y ", 640, 480, false);
+        chart1 = new Chart(series1Object1, series1Object2, "Wykres położenia w przestrzeni", "Położenie X ", "Położenie Y ", 640, 480, false, true);
         chart2 = nullptr;
         m_fftChart = nullptr;
         // ustaw obiekt wykresu jako widżet okna modularnego
@@ -837,7 +848,7 @@ void MainWindow::on_analyseProcessButton_pressed()
 
             m_fftChart = new FftChart(object1ArrayY, object1ArrayY2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "1", "Amplituda położenia Y");
             chart1 = new Chart(series1Object1, series2Object1, "Wykres położenia od czasu", "Czas [s]", "Położenie Y ", arrayLength/10, 480
-                               , false, "1 z pliku "+fileName1, "1 z pliku "+fileName2);
+                               , false, false, "1 z pliku "+fileName1, "1 z pliku "+fileName2);
         }
         else if(ui->obj2YRadio->isChecked())
         {
@@ -849,7 +860,7 @@ void MainWindow::on_analyseProcessButton_pressed()
 
             m_fftChart = new FftChart(object2ArrayY, object2ArrayY2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "2", "Amplituda położenia Y");
             chart1 = new Chart(series1Object2, series2Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie Y ", arrayLength/10, 480
-                               , false, "2 z pliku "+fileName1, "2 z pliku "+fileName2);
+                               , false, false, "2 z pliku "+fileName1, "2 z pliku "+fileName2);
         }
         else if(ui->obj1XRadio->isChecked())
         {
@@ -861,7 +872,7 @@ void MainWindow::on_analyseProcessButton_pressed()
 
             m_fftChart = new FftChart(object1ArrayX, object1ArrayX2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "1", "Amplituda położenia X");
             chart1 = new Chart(series1Object1, series2Object1, "Wykres położenia od czasu", "Czas [s]", "Położenie X ", arrayLength/10, 640
-                               , false, "1 z pliku "+fileName1, "1 z pliku "+fileName2);
+                               , false, false, "1 z pliku "+fileName1, "1 z pliku "+fileName2);
         }
         else
         {
@@ -873,7 +884,7 @@ void MainWindow::on_analyseProcessButton_pressed()
 
              m_fftChart = new FftChart(object2ArrayX, object2ArrayX2, array1Length, array2Length, "Wykres FFT", fileName1, fileName2, "2", "Amplituda położenia X");
              chart1 = new Chart(series1Object2, series2Object2, "Wykres położenia od czasu", "Czas [s]", "Położenie X ", arrayLength/10, 640
-                                , false, "2 z pliku "+fileName1, "2 z pliku "+fileName2);
+                                , false, false, "2 z pliku "+fileName1, "2 z pliku "+fileName2);
         }
 
         // wywołanie metod zwracających pole powierzchni przebiegów oraz wyświetlenie informacji

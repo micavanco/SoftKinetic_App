@@ -13,7 +13,7 @@ class Chart : public QChartView
     Q_OBJECT
 public:
     explicit Chart(QLineSeries *series1, QLineSeries *series2, QString title, QString axisXLabel, QString axisYLabel, int rangeX, int rangeY,
-                   bool hasMultiFiles, QString file1Name = "1", QString file2Name = "2", QLineSeries *series3 = nullptr, QLineSeries *series4 = nullptr,
+                   bool hasMultiFiles, bool inSpace = false, QString file1Name = "1", QString file2Name = "2", QLineSeries *series3 = nullptr, QLineSeries *series4 = nullptr,
                    QWidget *parent = nullptr);
     ~Chart();
 

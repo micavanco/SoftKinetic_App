@@ -5,11 +5,17 @@ ProjectionProcessorThread::ProjectionProcessorThread(QObject *parent) : QThread(
 {
 
 }
-
+/*
+    Utworzenie statycznych zmiennych w celu umożliwienia bezpośredniego odniesienia się w metodzie onNewDepthSample.
+    > cv::Mat       - obiekt z biblioteki OpenCV służący jako n-wymiarowa macierz o jedno lub wielo kanałowym zagęszczeniu
+*/
 static cv::Mat c_mat;
 static cv::Mat d_mat;
 
-// New color sample event handler
+/*
+    Metoda nasłuchująca, wywoływana przy każdorazowym odbiorze nowych danych (jedna klatka obrazu wideo
+    z kamery Softkinetic DS325 w postaci obrazu w przestrzeni kolorów RGB)
+*/
 void onNewColorSample(DepthSense::ColorNode node, DepthSense::ColorNode::NewSampleReceivedData data)
 {
     if(data.colorMap.size() != 0)
@@ -26,8 +32,10 @@ void onNewColorSample(DepthSense::ColorNode node, DepthSense::ColorNode::NewSamp
 
 /*
     Metoda nasłuchująca, wywoływana przy każdorazowym odbiorze nowych danych (jedna klatka obrazu wideo
-    z kamery Softkinetic DS325
-*/
+    z kamery Softkinetic DS325 dla trybu pracy głębi
+
+    Możliwość przyszłościowego rozwoju aplikacji o nowe funkcje badania głębi
+
 void onNewDepthSample2(DepthSense::DepthNode node, DepthSense::DepthNode::NewSampleReceivedData data)
 {
     int w, h;
@@ -36,22 +44,31 @@ void onNewDepthSample2(DepthSense::DepthNode node, DepthSense::DepthNode::NewSam
     memcpy(depth_mat.data, data.depthMap, w*h*sizeof(int16_t));
     d_mat=depth_mat;
 }
+*/
 
+/*
+    Wywołanie wątku dla transmisji obrazu z kamery
+*/
 void ProjectionProcessorThread::run()
    {
      using namespace cv;
-     trackRect=cv::Rect();
-     trackRect2=cv::Rect();
+     // Utworzenie zmiennych reprezentujących zaznaczane prostokąty na obrazach
+     trackRect  = cv::Rect();
+     trackRect2 = cv::Rect();
+     // Zmienne przechowujące obraz w reprezentacji HSV
      Mat hsv, hsv2;
      Mat backProj, backProj2;
+     // Zmienna określająca kryteria działania algorytmu MeanShift
      TermCriteria criteria;
      criteria.maxCount = 5;
      criteria.epsilon = 3;
      criteria.type = TermCriteria::EPS;
 
-     std::vector<DepthSense::Device> da; // wektor przechowujący obiekty będące reprezentacją pojedynczej podłączonej kamery, zawierające wszystkie niezbędne metody
+     // wektor przechowujący obiekty będące reprezentacją pojedynczej podłączonej kamery, zawierające wszystkie niezbędne metody
+     std::vector<DepthSense::Device> da;
 
-     m_context = DepthSense::Context::create("localhost"); // utworzenie połączenia lokalnego, komunikującego się z kamerą za pośrednictwem protokołu IP
+     // utworzenie połączenia lokalnego, komunikującego się z kamerą za pośrednictwem protokołu IP
+     m_context = DepthSense::Context::create("localhost");
      da = m_context.getDevices();
 
      if (da.size() >= 1)
@@ -64,11 +81,13 @@ void ProjectionProcessorThread::run()
          }
      else
      {
+         // emituj sygnał do GUI jeżeli nie udało się uzyskać żądnych podłączonych obiektów
          emit CameraOff(QString(tr("Kamera odłączona. \nSprawdź połączenie\nz komputerem \ni włącz ponownie.")));
          return;
      }
      emit CameraOn(QString::fromStdString(da[0].getSerialNumber()));
      m_cnode.newSampleReceivedEvent().connect(&onNewColorSample);    // przekazanie referencji do metody onNewColorSample do metody connect w celu powiązania funkcji
+     // --------- Możliwość przyszłościowego rozwoju aplikacji o nowe funkcje badania głębi --------
      //m_dnode.newSampleReceivedEvent().connect(&onNewDepthSample2);    // przekazanie referencji do metody onNewColorSample do metody connect w celu powiązania funkcji
 
      CameraThread camThread;    /*utworzenie nowego wątku*/          // przyjmującej odebrane dane z transmisji kamery, przekazywane jako parametry funkcji
@@ -91,63 +110,92 @@ void ProjectionProcessorThread::run()
            return;
        }
 
+       // skopiowanie obrazu przechwyconego z kamery do trzech zmiennych
        cv::Mat disp_mat3 = c_mat.clone();
        cv::Mat disp_mat2 = disp_mat3.clone();
        cv::Mat disp_mat = disp_mat2.clone();
 
+       // sprawdzenie, czy użytkownik zaznaczył prostokąt na pierwszym obrazie w GUI
        if(trackRect.size().area() > 0)
        {
+           // kowersja obrazu z przestrzeni barw RGB do reprezentacji HSV
            cvtColor(disp_mat, hsv, CV_BGR2HSV);
+           // odfiltrowanie pożądanego przedziału z poszczególnych wartości HSV obrazu
            cv::inRange(hsv, cv::Scalar(hueRed, saturationRed, valueRed),
                        cv::Scalar(hueRed+30, 255, 255), backProj);
 
-
+         // zablokowanie dostępu do tych samych danych przez dwa rózne wątki
          QMutexLocker locker(&rectMutex);
 
+            // sprawdzenie, czy użytkownik w tym momencie zaznacza szukany obiekt
             if(updateHistogram)
             {
+              // narysuj na obrazie prostokąt zaznaczony przez użytkownika
               rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
+              // emituj sygnał o zaznaczeniu
               emit newTitle(QString("Obiekt 1"));
               emit checkIfRecord();
 
               updateHistogram = false;
             }
+        // wywołanie implementacji algorytmu MeanShift do śledzenia obiektów
         meanShift(backProj, trackRect, criteria);
+        // ponowna konwersja z przestrzeni HSV do RGB w celu wyświetlenia obrazu w GUI
         cvtColor(backProj, disp_mat, CV_GRAY2BGR);
+        // rysuj prostokąt na obrazie
         rectangle(disp_mat, trackRect, Scalar(0, 0, 255));
         rectangle(disp_mat3, trackRect, Scalar(0, 0, 255));
-        corX=trackRect.x+trackRect.width/2;
-        corY=trackRect.y+trackRect.height/2;
+        // zapisz współrzędne obiektu do zmiennych
+        corX = trackRect.x+trackRect.width/2;
+        corY = trackRect.y+trackRect.height/2;
+        // wyślij współrzędne obiektu pierwszego do GUI
         emit monitorValuex(QString("%1").arg(corX));
         emit monitorValuey(QString("%1").arg(480-corY));
        }
 
+       // sprawdzenie, czy użytkownik zaznaczył prostokąt na drugim obrazie w GUI
        if(trackRect2.size().area() > 0)
        {
+         // kowersja obrazu z przestrzeni barw RGB do reprezentacji HSV
          cvtColor(disp_mat2, hsv2, CV_BGR2HSV);
+         // odfiltrowanie pożądanego przedziału z poszczególnych wartości HSV obrazu
          cv::inRange(hsv2, cv::Scalar(hueBlue, saturationBlue, valueBlue), cv::Scalar(hueBlue+30, 255, 255), backProj2);
 
+         // zablokowanie dostępu do tych samych danych przez dwa rózne wątki
          QMutexLocker locker(&rectMutex2);
+
+         // sprawdzenie, czy użytkownik w tym momencie zaznacza szukany obiekt
          if(updateHistogram2)
          {
+           // narysuj na obrazie prostokąt zaznaczony przez użytkownika
            rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
+           // emituj sygnał o zaznaczeniu
            emit newTitle2(QString("Obiekt 2"));
            emit checkIfRecord();
 
            updateHistogram2 = false;
          }
+         // wywołanie implementacji algorytmu MeanShift do śledzenia obiektów
          meanShift(backProj2, trackRect2, criteria);
+         // ponowna konwersja z przestrzeni HSV do RGB w celu wyświetlenia obrazu w GUI
          cvtColor(backProj2, disp_mat2, CV_GRAY2BGR);
+         // rysuj prostokąt na obrazie
          rectangle(disp_mat2, trackRect2, Scalar(255, 0, 0));
          rectangle(disp_mat3, trackRect2, Scalar(255, 0, 0));
+        // zapisz współrzędne obiektu do zmiennych
         corX2=trackRect2.x+trackRect2.width/2;
         corY2=trackRect2.y+trackRect2.height/2;
+        // wyślij współrzędne obiektu drugiego do GUI
         emit monitorValue2x(QString("%1").arg(corX2));
         emit monitorValue2y(QString("%1").arg(480-corY2));
        }
+
+       // wyślij informację do GUI o włączonej kamerze
        emit CameraOn(QString("Włączona"));
+
+       // sprawdź, czy macierz zawiera dane
         if(!disp_mat.empty())
-       emit newFrame(
+       emit newFrame(// wyślij obraz do elementu GUI
             QPixmap::fromImage(
                QImage(
                  disp_mat.data,
@@ -178,19 +226,21 @@ void ProjectionProcessorThread::run()
                      .rgbSwapped()));
 
      }
+     // po otrzymaniu informacji o zakończeniu wątku, emitowany jest sygnał o informacji wyłączonej kamery
      emit CameraOff(QString("Wyłączona"));
 
      m_context.stopNodes();  // zatrzymanie transmisji
-     m_context.quit();   // zatrzymanie wątku
+     m_context.quit();       // zatrzymanie wątku
      m_context.unregisterNode(m_cnode); // wyrejestrowanie wątku transmisji z kontekstu połączenia
-     m_context.unregisterNode(m_dnode); // wyrejestrowanie wątku transmisji z kontekstu połączenia
+     //m_context.unregisterNode(m_dnode);  wyrejestrowanie wątku transmisji z kontekstu połączenia
      m_cnode.unset();
-     m_dnode.unset();
+     //m_dnode.unset();
      camThread.requestInterruption(); // wysłanie prośby o zatrzymanie wątku
      camThread.wait();
      cv::destroyAllWindows();
 }
-
+// --------- Możliwość przyszłościowego rozwoju aplikacji o nowe funkcje badania głębi --------
+/*
 cv::Mat ProjectionProcessorThread::ModDepthForDisplay(const cv::Mat &mat)
 {
         const float depth_near = 0;
@@ -234,8 +284,10 @@ cv::Mat ProjectionProcessorThread::ModDepthForDisplay(const cv::Mat &mat)
         cv::applyColorMap(cmat, cmat, 2); // zastosuj daną mapę kolorów
 
         return cmat;
-}
-
+}*/
+/*
+    Metoda konfigurująca parametry transmisji z kamerą SoftKinetic dla przesyłu obrazu w postaci RGB
+*/
 void ProjectionProcessorThread::configureColorNode()
 {
 
@@ -283,9 +335,10 @@ void ProjectionProcessorThread::configureColorNode()
     }
 }
 
+// --------- Możliwość przyszłościowego rozwoju aplikacji o nowe funkcje badania głębi --------
 /*
     Metoda wykorzystywana do konfiguracji trybu pracy kamery - w tym przypadku do konfiguracji trybu głębi
-*/
+
 void ProjectionProcessorThread::configureDepthNode()
 {
     DepthSense::DepthNode::Configuration config = m_dnode.getConfiguration(); // pobierz konfiguracje z kontekstu połączenia z kamerą
@@ -332,15 +385,19 @@ void ProjectionProcessorThread::configureDepthNode()
 
     }
 }
+*/
 
+/*
+    Metoda konfigurująca parametry transmisji z kamerą SoftKinetic
+*/
 void ProjectionProcessorThread::configureNode(DepthSense::Node node)
 {
-    if ((node.is<DepthSense::DepthNode>()) && (!m_dnode.isSet()))   // jeżeli nowo utworzony wątek transmisji jest typu głębi i wątek nie jest ustawiony
+    /*if ((node.is<DepthSense::DepthNode>()) && (!m_dnode.isSet()))   // jeżeli nowo utworzony wątek transmisji jest typu głębi i wątek nie jest ustawiony
     {
         m_dnode = node.as<DepthSense::DepthNode>(); // ustaw nowy wątek transmisji na tryb głębi
         configureDepthNode();   // konfiguruj szczegóły trybów pracy kamery
         m_context.registerNode(node);   // zarejestruj nowy wątek w kontekście obsługiwanej kamery
-    }
+    }*/
 
     if ((node.is<DepthSense::ColorNode>()) && (!m_cnode.isSet()))
     {
@@ -350,9 +407,12 @@ void ProjectionProcessorThread::configureNode(DepthSense::Node node)
     }
 
 }
-
+/*
+  Metoda przypisująca wymiary zaznaczonego przez użytkownika prostokąta na obrazie z kamery dla obiektu pierwszego
+*/
 void ProjectionProcessorThread::setTrackRect(QRect rect)
 {
+  // zablokowanie dostępu do tych samych danych przez dwa rózne wątki
   QMutexLocker locker(&rectMutex);
   if((rect.width()>2) && (rect.height()>2))
   {
@@ -374,9 +434,12 @@ void ProjectionProcessorThread::setTrackRect(QRect rect)
      updateHistogram = true;
   }
 }
-
+/*
+  Metoda przypisująca wymiary zaznaczonego przez użytkownika prostokąta na obrazie z kamery dla obiektu drugiego
+*/
 void ProjectionProcessorThread::setTrackRect2(QRect rect)
 {
+  // zablokowanie dostępu do tych samych danych przez dwa rózne wątki
   QMutexLocker locker(&rectMutex2);
   if((rect.width()>2) && (rect.height()>2))
   {
